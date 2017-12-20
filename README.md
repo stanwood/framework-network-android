@@ -1,3 +1,5 @@
+[![Release](https://jitpack.io/v/stanwood/Network_android.svg?style=flat-square)](https://jitpack.io/#stanwood/Network_android)
+
 # stanwood Network Utilities (Android)
 
 A set of hopefully useful classes for common networking use cases.
