@@ -13,9 +13,11 @@ public class CacheNetworkInterceptor implements Interceptor {
 
     @Nullable
     private final String queryAuthParameterKey;
+    private final long cacheForSeconds;
 
-    public CacheNetworkInterceptor(@Nullable String queryAuthParameterKey) {
+    public CacheNetworkInterceptor(@Nullable String queryAuthParameterKey, long cacheForSeconds) {
         this.queryAuthParameterKey = queryAuthParameterKey;
+        this.cacheForSeconds = cacheForSeconds;
     }
 
     @Override
@@ -51,7 +53,7 @@ public class CacheNetworkInterceptor implements Interceptor {
     private String getCacheControl(boolean isGeneralCache) {
         if (isGeneralCache) {
             // cache data for an hour
-            return "public, max-age=" + 3600;
+            return "public, max-age=" + cacheForSeconds;
         } else {
             // only put into cache for offline cache, other than that cache will not be used
             return "public, max-age=" + 0;

@@ -2,7 +2,7 @@ package io.stanwood.framework.network.cache;
 
 public abstract class RequestConstants {
 
-    public final static String APPLY_OFFLINE_CACHE = "ApplyOfflineCache";
-    public final static String APPLY_RESPONSE_CACHE = "ApplyResponseCache";
-    public final static String REFRESH = "ForceNetwork";
+    final static String APPLY_OFFLINE_CACHE = "ApplyOfflineCache";
+    final static String APPLY_RESPONSE_CACHE = "ApplyResponseCache";
+    final static String REFRESH = "ForceNetwork";
 }
