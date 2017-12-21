@@ -6,19 +6,20 @@ package io.stanwood.framework.network.cache;
  *
  * Add any combination of these headers to your requests and the interceptors will pick them up.
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class HeaderKeys {
 
     /**
      * Allows caching this request for offline usage. That doesn't mean it is used as online cache.
      * That depends on the setting of the {@link #APPLY_RESPONSE_CACHE} header.
      */
-    final static String APPLY_OFFLINE_CACHE = "ApplyOfflineCache";
+    public final static String APPLY_OFFLINE_CACHE = "ApplyOfflineCache";
 
     /**
      * Allows caching this request for online usage. That doesn't mean it is used as offline cache.
      * That depends on the setting of the {@link #APPLY_OFFLINE_CACHE} header.
      */
-    final static String APPLY_RESPONSE_CACHE = "ApplyResponseCache";
+    public final static String APPLY_RESPONSE_CACHE = "ApplyResponseCache";
 
     /**
      * Setting this header to {@code true} tells the interceptors to always try to fulfill the
@@ -26,5 +27,5 @@ public abstract class HeaderKeys {
      * offline and offline caching is allowed by means of the APPLY_OFFLINE_CACHE header the cache
      * is used.
      */
-    final static String REFRESH = "ForceNetwork";
+    public final static String REFRESH = "ForceNetwork";
 }
