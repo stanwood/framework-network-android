@@ -1,0 +1,100 @@
+package io.stanwood.framework.network.cache;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
+
+/**
+ * This class works closely together with {@link CacheInterceptor} to bring offline and regular
+ * caching to you no matter what the server tells you about caching (that is, all relevant caching
+ * headers returned by the server or set by you before the interceptors run are overridden!).
+ *
+ * <p>Especially useful when trying to cache responses of APIs which discourage caching for one or the
+ * other reason, but you absolutely need it (if only to handle offline cases without setting up a
+ * more sophisticated persistence layer - that being said always prefer a proper persistence
+ * layer instead of just relying on an HTTP cache which just isn't build for this and thus not
+ * without flaws, but it still may serve in smaller use cases).
+ *
+ * <p>It does so by removing any auth query parameters from the response before caching so that the
+ * Cache is hit when offline even if we don't have an auth token or another auth token at the moment.
+ *
+ * <p>This also means that you are responsible for clearing the Cache once the user logs out if your
+ * app contains such a mechanic.
+ *
+ * <p>Keep in mind that you are also responsible to remove any other query parameters which are not
+ * stable over time by means of adding more app- and network-interceptors before the ones provided by
+ * this library. In the future this might be added to the provided interceptors by means of
+ * accepting a list of parameter keys instead of just the one of the auth parameter.
+ *
+ * <p>Configuration of the interceptor classes is mainly done by means of request headers. Check
+ * out {@link HeaderKeys} for more details on what the different headers do.
+ *
+ * <p>Add it as a network interceptor to your OkHttpClient Builder like so:
+ * <pre>
+ * {@code okHttpClientBuilder.addNetworkInterceptor(new CacheNetworkInterceptor("auth", 3600))}
+ * </pre>
+ */
+public class CacheNetworkInterceptor implements Interceptor {
+
+    @Nullable
+    private final String queryAuthParameterKey;
+    private final long cacheForSeconds;
+
+    /**
+     * Constructs a new CacheNetworkInterceptor instance.
+     *
+     * @param queryAuthParameterKey the name of any auth query parameter to be removed before caching
+     *                             or {@code null} if there is none
+     * @param cacheForSeconds seconds for which we should generally cache in case the
+     *                       {@link HeaderKeys#APPLY_RESPONSE_CACHE} is set
+     */
+    public CacheNetworkInterceptor(@Nullable String queryAuthParameterKey, long cacheForSeconds) {
+        this.queryAuthParameterKey = queryAuthParameterKey;
+        this.cacheForSeconds = cacheForSeconds;
+    }
+
+    @Override
+    public Response intercept(@NonNull Chain chain) throws IOException {
+        Request request = chain.request();
+        String responseCacheHeader = request.header(HeaderKeys.APPLY_RESPONSE_CACHE);
+        String offlineCacheHeader = request.header(HeaderKeys.APPLY_OFFLINE_CACHE);
+        boolean isGeneralCache = Boolean.valueOf(responseCacheHeader);
+        boolean isOfflineCache = Boolean.valueOf(offlineCacheHeader);
+        if (isGeneralCache || isOfflineCache) {
+            Response originalResponse = chain.proceed(request);
+            Response.Builder builder = originalResponse.newBuilder();
+            if (queryAuthParameterKey != null) {
+                builder.request(originalResponse
+                        .request()
+                        .newBuilder()
+                        .url(request
+                                .url()
+                                .newBuilder()
+                                .removeAllQueryParameters(queryAuthParameterKey)
+                                .build())
+                        .build());
+            }
+            return builder
+                    .header("Cache-Control", getCacheControl(isGeneralCache))
+                    .build();
+        } else {
+            return chain.proceed(request);
+        }
+    }
+
+    @NonNull
+    private String getCacheControl(boolean isGeneralCache) {
+        if (isGeneralCache) {
+            // cache data for an hour
+            return "public, max-age=" + cacheForSeconds;
+        } else {
+            // only put into cache for offline cache, other than that cache will not be used
+            return "public, max-age=" + 0;
+        }
+    }
+}
