@@ -65,7 +65,7 @@ public class CacheInterceptor implements Interceptor {
         Request request = chain.request();
 
         String offlineCacheHeader = request.header(HeaderKeys.APPLY_OFFLINE_CACHE);
-        if (offlineCacheHeader != null && Boolean.valueOf(offlineCacheHeader)) {
+        if (Boolean.valueOf(offlineCacheHeader)) {
             if (!isConnected()) {
                 Request.Builder builder = request.newBuilder();
                 if (queryAuthParameterKey != null) {
@@ -85,7 +85,7 @@ public class CacheInterceptor implements Interceptor {
         }
 
         String responseCacheHeader = request.header(HeaderKeys.REFRESH);
-        if (responseCacheHeader != null && Boolean.valueOf(responseCacheHeader)) {
+        if (Boolean.valueOf(responseCacheHeader)) {
             try {
                 return chain.proceed(request.newBuilder().cacheControl(CacheControl.FORCE_NETWORK).build());
             } catch (IOException e) {

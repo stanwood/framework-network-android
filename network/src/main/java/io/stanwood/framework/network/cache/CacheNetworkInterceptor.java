@@ -63,8 +63,8 @@ public class CacheNetworkInterceptor implements Interceptor {
         Request request = chain.request();
         String responseCacheHeader = request.header(HeaderKeys.APPLY_RESPONSE_CACHE);
         String offlineCacheHeader = request.header(HeaderKeys.APPLY_OFFLINE_CACHE);
-        boolean isGeneralCache = responseCacheHeader != null && Boolean.valueOf(responseCacheHeader);
-        boolean isOfflineCache = offlineCacheHeader != null && Boolean.valueOf(offlineCacheHeader);
+        boolean isGeneralCache = Boolean.valueOf(responseCacheHeader);
+        boolean isOfflineCache = Boolean.valueOf(offlineCacheHeader);
         if (isGeneralCache || isOfflineCache) {
             Response originalResponse = chain.proceed(request);
             Response.Builder builder = originalResponse.newBuilder();
