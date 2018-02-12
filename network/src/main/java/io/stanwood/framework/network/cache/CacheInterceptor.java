@@ -1,12 +1,8 @@
 package io.stanwood.framework.network.cache;
 
-import android.Manifest;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresPermission;
 
 import java.io.IOException;
 
@@ -64,7 +60,7 @@ public class CacheInterceptor implements Interceptor {
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
 
-        String offlineCacheHeader = request.header(HeaderKeys.APPLY_OFFLINE_CACHE);
+        String offlineCacheHeader = request.header(CacheHeaderKeys.APPLY_OFFLINE_CACHE);
         if (Boolean.valueOf(offlineCacheHeader)) {
             if (!connectionState.isConnected()) {
                 Request.Builder builder = request.newBuilder();
@@ -77,14 +73,14 @@ public class CacheInterceptor implements Interceptor {
                 }
                 request = builder
                         .cacheControl(CacheControl.FORCE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_OFFLINE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_RESPONSE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_OFFLINE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_RESPONSE_CACHE)
                         .build();
                 return chain.proceed(request);
             }
         }
 
-        String responseCacheHeader = request.header(HeaderKeys.REFRESH);
+        String responseCacheHeader = request.header(CacheHeaderKeys.REFRESH);
         if (Boolean.valueOf(responseCacheHeader)) {
             try {
                 return chain.proceed(request.newBuilder().cacheControl(CacheControl.FORCE_NETWORK).build());
@@ -103,8 +99,8 @@ public class CacheInterceptor implements Interceptor {
                 }
                 return chain.proceed(builder
                         .cacheControl(CacheControl.FORCE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_OFFLINE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_RESPONSE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_OFFLINE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_RESPONSE_CACHE)
                         .build());
             }
         } else {
