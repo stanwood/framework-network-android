@@ -80,7 +80,7 @@ new OkHttpClient.Builder()
 
 That's it. When using this `OkHttpClient` instance you'll benefit from fully transparent token handling.
 
-### Anonymous
+#### Anonymous
 
 The implementation for anonymous authentication is very similar to the authenticated one.
 We'll just point out the differences here.
@@ -91,6 +91,6 @@ The constructors are nearly the same, but the `AnonymousAuthenticator` also acce
 You can pass an instance here and the `AnonymousAuthenticator` will attempt to use the authenticated token if the user is signed in (determined via `AuthenticationProvider.isUserSignedIn()`).
 You can pass `null` here if you don't have means for authenticated authentication or your API doesn't support accessing certain endpoints with authenticated tokens.
 
-### Tips and tricks
+#### _Auth_ tips and tricks
 
 If your API provides both anonymous and authenticated access you will want to use one `OkHttpClient` instances per case and pass the according authenticators and interceptors during creation.
