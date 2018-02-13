@@ -2,7 +2,7 @@ package io.stanwood.framework.network.auth;
 
 import java.io.IOException;
 
-public interface AuthenticationService {
+public interface AuthenticationProvider {
 
     /**
      * Lock used by anonymous Authenticator / Auth Interceptor when requesting tokens. Provide a
