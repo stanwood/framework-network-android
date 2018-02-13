@@ -1,15 +1,12 @@
 package io.stanwood.framework.network.cache;
 
-import android.Manifest;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresPermission;
 
 import java.io.IOException;
 
+import io.stanwood.framework.network.util.ConnectionState;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -32,7 +29,8 @@ import okhttp3.Response;
  */
 public class CacheInterceptor implements Interceptor {
 
-    private final ConnectivityManager connectivityManager;
+    @NonNull
+    private ConnectionState connectionState;
     @Nullable
     private final String queryAuthParameterKey;
     @Nullable
@@ -49,24 +47,22 @@ public class CacheInterceptor implements Interceptor {
      *                      stale) - useful for logging, but you can also modify the request before
      *                      it is used to check the cache.
      */
-    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     public CacheInterceptor(
             @NonNull Context applicationContext,
             @Nullable String queryAuthParameterKey,
             @Nullable ErrorCallback errorCallback) {
-        connectivityManager = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectionState = new ConnectionState(applicationContext);
         this.queryAuthParameterKey = queryAuthParameterKey;
         this.errorCallback = errorCallback;
     }
 
     @Override
-    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
 
-        String offlineCacheHeader = request.header(HeaderKeys.APPLY_OFFLINE_CACHE);
+        String offlineCacheHeader = request.header(CacheHeaderKeys.APPLY_OFFLINE_CACHE);
         if (Boolean.valueOf(offlineCacheHeader)) {
-            if (!isConnected()) {
+            if (!connectionState.isConnected()) {
                 Request.Builder builder = request.newBuilder();
                 if (queryAuthParameterKey != null) {
                     builder.url(request
@@ -77,14 +73,14 @@ public class CacheInterceptor implements Interceptor {
                 }
                 request = builder
                         .cacheControl(CacheControl.FORCE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_OFFLINE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_RESPONSE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_OFFLINE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_RESPONSE_CACHE)
                         .build();
                 return chain.proceed(request);
             }
         }
 
-        String responseCacheHeader = request.header(HeaderKeys.REFRESH);
+        String responseCacheHeader = request.header(CacheHeaderKeys.REFRESH);
         if (Boolean.valueOf(responseCacheHeader)) {
             try {
                 return chain.proceed(request.newBuilder().cacheControl(CacheControl.FORCE_NETWORK).build());
@@ -103,19 +99,13 @@ public class CacheInterceptor implements Interceptor {
                 }
                 return chain.proceed(builder
                         .cacheControl(CacheControl.FORCE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_OFFLINE_CACHE)
-                        .removeHeader(HeaderKeys.APPLY_RESPONSE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_OFFLINE_CACHE)
+                        .removeHeader(CacheHeaderKeys.APPLY_RESPONSE_CACHE)
                         .build());
             }
         } else {
             return chain.proceed(request);
         }
-    }
-
-    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-    private boolean isConnected() {
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     public interface ErrorCallback {
