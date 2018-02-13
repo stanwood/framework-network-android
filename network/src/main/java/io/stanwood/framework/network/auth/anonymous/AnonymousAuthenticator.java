@@ -1,5 +1,6 @@
 package io.stanwood.framework.network.auth.anonymous;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -31,17 +32,21 @@ public class AnonymousAuthenticator implements Authenticator {
     private final AuthenticatedAuthenticator authenticatedAuthenticator;
     @NonNull
     private final TokenReaderWriter tokenReaderWriter;
+    @Nullable
+    private final OnAuthenticationFailedListener onAuthenticationFailedListener;
 
     public AnonymousAuthenticator(
             @NonNull AuthenticationService authenticationService,
             @NonNull AnonymousAuthInterceptor anonymousAuthInterceptor,
             @Nullable AuthenticatedAuthenticator authenticatedAuthenticator,
-            @NonNull TokenReaderWriter tokenReaderWriter
+            @NonNull TokenReaderWriter tokenReaderWriter,
+            @Nullable OnAuthenticationFailedListener onAuthenticationFailedListener
     ) {
         this.authenticationService = authenticationService;
         this.anonymousAuthInterceptor = anonymousAuthInterceptor;
         this.authenticatedAuthenticator = authenticatedAuthenticator;
         this.tokenReaderWriter = tokenReaderWriter;
+        this.onAuthenticationFailedListener = onAuthenticationFailedListener;
     }
 
     @Override
@@ -110,8 +115,17 @@ public class AnonymousAuthenticator implements Authenticator {
      * @return Request to be passed forward to okhttp
      */
     @SuppressWarnings("WeakerAccess")
+    @CallSuper
     @Nullable
     protected Request onAuthenticationFailed(@NonNull Request request) {
-        return null; // Give up, we've already failed to authenticate even after refreshing the token.
+        // Give up, we've already failed to authenticate even after refreshing the token.
+        if (onAuthenticationFailedListener != null) {
+            onAuthenticationFailedListener.onAuthenticationFailed(request);
+        }
+        return null;
+    }
+
+    public interface OnAuthenticationFailedListener {
+        void onAuthenticationFailed(@NonNull Request request);
     }
 }

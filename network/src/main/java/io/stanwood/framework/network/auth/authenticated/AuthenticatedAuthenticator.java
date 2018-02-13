@@ -1,5 +1,6 @@
 package io.stanwood.framework.network.auth.authenticated;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -19,13 +20,17 @@ public class AuthenticatedAuthenticator implements Authenticator {
     private final AuthenticationService authenticationService;
     @NonNull
     private final TokenReaderWriter tokenReaderWriter;
+    @Nullable
+    private final OnAuthenticationFailedListener onAuthenticationFailedListener;
 
     public AuthenticatedAuthenticator(
             @NonNull AuthenticationService authenticationService,
-            @NonNull TokenReaderWriter tokenReaderWriter
+            @NonNull TokenReaderWriter tokenReaderWriter,
+            @Nullable OnAuthenticationFailedListener onAuthenticationFailedListener
     ) {
         this.authenticationService = authenticationService;
         this.tokenReaderWriter = tokenReaderWriter;
+        this.onAuthenticationFailedListener = onAuthenticationFailedListener;
     }
 
     @Override
@@ -80,12 +85,20 @@ public class AuthenticatedAuthenticator implements Authenticator {
      * <br><br>
      * The default implementation just returns {@code null} and thus cancels the request.
      *
-     * @return Request to be passed forward to okhttp
+     * @return Request to be passed forward to okhttp, can be {@code null}
      */
     @SuppressWarnings("WeakerAccess")
+    @CallSuper
     @Nullable
     protected Request onAuthenticationFailed(@NonNull Request request) {
         // Give up, we've already failed to authenticate even after refreshing the token.
+        if (onAuthenticationFailedListener != null) {
+            onAuthenticationFailedListener.onAuthenticationFailed(request);
+        }
         return null;
+    }
+
+    public interface OnAuthenticationFailedListener {
+        void onAuthenticationFailed(@NonNull Request request);
     }
 }
