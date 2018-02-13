@@ -1,4 +1,4 @@
-package io.stanwood.framework.network.auth.anonymous;
+package io.stanwood.framework.network.auth.authenticated;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,60 +8,29 @@ import java.io.IOException;
 import io.stanwood.framework.network.auth.AuthHeaderKeys;
 import io.stanwood.framework.network.auth.AuthenticationService;
 import io.stanwood.framework.network.auth.TokenReaderWriter;
-import io.stanwood.framework.network.auth.authenticated.AuthenticatedAuthenticator;
 import okhttp3.Authenticator;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 
-/**
- * This class will be called by okhttp upon receiving a 401 from the server which means we should
- * usually retry the request with a fresh token.
- * <p>
- * It is NOT called for during initially making a request. For that refer to
- * {@link AnonymousAuthInterceptor}.
- */
-public abstract class AnonymousAuthenticator implements Authenticator {
+public class AuthenticatedAuthenticator implements Authenticator {
 
     @NonNull
     private final AuthenticationService authenticationService;
     @NonNull
-    private final AnonymousAuthInterceptor anonymousAuthInterceptor;
-    @Nullable
-    private final AuthenticatedAuthenticator authenticatedAuthenticator;
-    @NonNull
     private final TokenReaderWriter tokenReaderWriter;
 
-    public AnonymousAuthenticator(
+    public AuthenticatedAuthenticator(
             @NonNull AuthenticationService authenticationService,
-            @NonNull AnonymousAuthInterceptor anonymousAuthInterceptor,
-            @Nullable AuthenticatedAuthenticator authenticatedAuthenticator,
             @NonNull TokenReaderWriter tokenReaderWriter
     ) {
         this.authenticationService = authenticationService;
-        this.anonymousAuthInterceptor = anonymousAuthInterceptor;
-        this.authenticatedAuthenticator = authenticatedAuthenticator;
         this.tokenReaderWriter = tokenReaderWriter;
     }
 
     @Override
     public Request authenticate(@NonNull Route route, @NonNull Response response) throws IOException {
-        Request request;
-        if (authenticatedAuthenticator != null && authenticationService.isUserSignedIn()) {
-            // as we are already signed in we'll go ahead and try to log in with authentication
-            final Request authenticatedRequest = authenticatedAuthenticator.authenticate(route, response);
-            if (authenticatedRequest != null) {
-                return authenticatedRequest;
-            } else {
-                /*
-                at this point we've been signed out by the AuthenticatedAuthenticator due to some
-                unrecoverable error and we're trying again anonymously
-                */
-                request = anonymousAuthInterceptor.getRequest(response.request(), authenticationService);
-            }
-        } else {
-            request = response.request();
-        }
+        Request request = response.request();
 
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
@@ -69,8 +38,9 @@ public abstract class AnonymousAuthenticator implements Authenticator {
                 synchronized (AuthenticationService.ANONYMOUS_AUTH_REFRESH_TOKEN_LOCK) {
                     String token;
                     try {
-                        token = authenticationService.getAnonymousToken(false);
+                        token = authenticationService.getToken(false);
                     } catch (Exception e) {
+                        // TODO should we sign out in this case as well?
                         throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                     }
 
@@ -81,7 +51,7 @@ public abstract class AnonymousAuthenticator implements Authenticator {
                         re-authenticating before us getting here), try to get a new one
                         */
                         try {
-                            token = authenticationService.getAnonymousToken(true);
+                            token = authenticationService.getToken(true);
                         } catch (Exception e) {
                             throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                         }
@@ -95,6 +65,9 @@ public abstract class AnonymousAuthenticator implements Authenticator {
                             token);
                 }
             } else {
+                if (authenticationService.isUserSignedIn()) {
+                    authenticationService.signOut();
+                }
                 return onAuthenticationFailed(request);
             }
         }
@@ -112,6 +85,7 @@ public abstract class AnonymousAuthenticator implements Authenticator {
     @SuppressWarnings("WeakerAccess")
     @Nullable
     protected Request onAuthenticationFailed(@NonNull Request request) {
-        return null; // Give up, we've already failed to authenticate even after refreshing the token.
+        // Give up, we've already failed to authenticate even after refreshing the token.
+        return null;
     }
 }

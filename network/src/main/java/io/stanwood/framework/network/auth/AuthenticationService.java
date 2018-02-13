@@ -31,4 +31,11 @@ public interface AuthenticationService {
      * @return whether the user is logged in
      */
     boolean isUserSignedIn();
+
+    /**
+     * Signs out the user.
+     * <br><br>
+     * Called when authentication fails permanently while being in authenticated mode.
+     */
+    void signOut();
 }
