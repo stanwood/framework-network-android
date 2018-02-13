@@ -21,7 +21,7 @@ import okhttp3.Route;
  * It is NOT called during initially making a request. For that refer to
  * {@link AnonymousAuthInterceptor}.
  */
-public abstract class AnonymousAuthenticator implements Authenticator {
+public class AnonymousAuthenticator implements Authenticator {
 
     @NonNull
     private final AuthenticationService authenticationService;
