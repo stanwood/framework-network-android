@@ -43,7 +43,7 @@ public class AuthenticatedAuthenticator implements Authenticator {
                 synchronized (authenticationProvider.getAuthenticatedLock()) {
                     String token;
                     try {
-                        token = authenticationProvider.getToken(false);
+                        token = authenticationProvider.getAuthenticatedToken(false);
                     } catch (Exception e) {
                         // TODO should we sign out in this case as well?
                         throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
@@ -56,7 +56,7 @@ public class AuthenticatedAuthenticator implements Authenticator {
                         re-authenticating before us getting here), try to get a new one
                         */
                         try {
-                            token = authenticationProvider.getToken(true);
+                            token = authenticationProvider.getAuthenticatedToken(true);
                         } catch (Exception e) {
                             throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                         }
