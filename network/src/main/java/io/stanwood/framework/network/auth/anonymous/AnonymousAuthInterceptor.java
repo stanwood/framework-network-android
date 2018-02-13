@@ -50,7 +50,7 @@ public class AnonymousAuthInterceptor implements Interceptor {
 
         if (connectionState.isConnected()) {
             String token;
-            synchronized (AuthenticationService.ANONYMOUS_AUTH_REFRESH_TOKEN_LOCK) {
+            synchronized (authenticationService.getAnonymousLock()) {
                 try {
                     token = authenticationService.getAnonymousToken(false);
                 } catch (Exception e) {

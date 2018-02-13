@@ -41,7 +41,7 @@ public class AuthenticatedAuthInterceptor implements Interceptor {
 
         if (connectionState.isConnected()) {
             String token;
-            synchronized (AuthenticationService.ANONYMOUS_AUTH_REFRESH_TOKEN_LOCK) {
+            synchronized (authenticationService.getAuthenticatedLock()) {
                 try {
                     token = authenticationService.getToken(false);
                 } catch (Exception e) {

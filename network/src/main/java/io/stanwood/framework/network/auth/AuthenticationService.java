@@ -5,9 +5,16 @@ import java.io.IOException;
 public interface AuthenticationService {
 
     /**
-     * Lock used by anonymous Authenticator / Auth Interceptor when requesting tokens
+     * Lock used by anonymous Authenticator / Auth Interceptor when requesting tokens. Provide a
+     * final static Object here.
      */
-    Object ANONYMOUS_AUTH_REFRESH_TOKEN_LOCK = new Object();
+    Object getAnonymousLock();
+
+    /**
+     * Lock used by anonymous Authenticator / Auth Interceptor when requesting tokens. Provide a
+     * final static Object here.
+     */
+    Object getAuthenticatedLock();
 
     /**
      * Retrieves a token for authenticated access

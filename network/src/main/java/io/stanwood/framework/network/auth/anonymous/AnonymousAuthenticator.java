@@ -66,7 +66,7 @@ public abstract class AnonymousAuthenticator implements Authenticator {
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
             if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
-                synchronized (AuthenticationService.ANONYMOUS_AUTH_REFRESH_TOKEN_LOCK) {
+                synchronized (authenticationService.getAnonymousLock()) {
                     String token;
                     try {
                         token = authenticationService.getAnonymousToken(false);
