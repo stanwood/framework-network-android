@@ -1,4 +1,4 @@
-package io.stanwood.framework.network.auth;
+package io.stanwood.framework.network.auth.anonymous;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 
 import java.io.IOException;
 
+import io.stanwood.framework.network.auth.AuthHeaderKeys;
+import io.stanwood.framework.network.auth.AuthenticationService;
+import io.stanwood.framework.network.auth.TokenReaderWriter;
 import io.stanwood.framework.network.util.ConnectionState;
 import okhttp3.Authenticator;
 import okhttp3.Request;
@@ -15,14 +18,17 @@ import okhttp3.Route;
 /**
  * This class will be called by okhttp upon receiving a 401 from the server which means we should
  * usually retry the request with a fresh token.
- *
+ * <p>
  * It is NOT called for during initially making a request. For that refer to
  * {@link AnonymousAuthInterceptor}.
  */
 public abstract class AnonymousAuthenticator implements Authenticator {
 
+    @NonNull
     private final AuthenticationService authenticationService;
+    @NonNull
     private final ConnectionState connectionState;
+    @NonNull
     private final TokenReaderWriter tokenReaderWriter;
 
     public AnonymousAuthenticator(
@@ -30,9 +36,9 @@ public abstract class AnonymousAuthenticator implements Authenticator {
             @NonNull AuthenticationService authenticationService,
             @NonNull TokenReaderWriter tokenReaderWriter
     ) {
-       this.authenticationService = authenticationService;
-       this.connectionState = new ConnectionState(applicationContext);
-       this.tokenReaderWriter = tokenReaderWriter;
+        this.connectionState = new ConnectionState(applicationContext);
+        this.authenticationService = authenticationService;
+        this.tokenReaderWriter = tokenReaderWriter;
     }
 
     @Override
@@ -64,9 +70,10 @@ public abstract class AnonymousAuthenticator implements Authenticator {
                     }
 
                     return tokenReaderWriter.write(
-                            request.newBuilder()
-                                    .removeHeader(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY)
-                                    .build(),
+                            tokenReaderWriter.removeToken(
+                                    request.newBuilder()
+                                            .removeHeader(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY)
+                                            .build()),
                             token);
                 }
             } else {
@@ -81,6 +88,7 @@ public abstract class AnonymousAuthenticator implements Authenticator {
      * Called upon ultimately failed authentication.
      * <br><br>
      * The default implementation just returns {@code null} and thus cancels the request.
+     *
      * @return
      */
     @SuppressWarnings("WeakerAccess")

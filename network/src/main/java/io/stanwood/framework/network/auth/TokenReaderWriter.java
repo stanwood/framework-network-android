@@ -1,5 +1,6 @@
 package io.stanwood.framework.network.auth;
 
+import io.stanwood.framework.network.auth.anonymous.AnonymousAuthenticator;
 import okhttp3.Request;
 
 /**
@@ -26,11 +27,19 @@ public interface TokenReaderWriter {
     /**
      * Writes a token to the request (most probably either to a header or as an URL parameter.
      * <br><br>
-     * Ensure to delete/override any existing tokens!
+     * You don't need to explicitly remove possibly existing tokens as {@link #removeToken(Request)}
+     * will be called for you before.
      *
      * @param request okhttp Request
      * @param token the token to write
-     * @return
+     * @return the Request with token
      */
     Request write(Request request, String token);
+
+    /**
+     * Removes the token from the given request.
+     * @param request okhttp Request
+     * @return the Request without token
+     */
+    Request removeToken(Request request);
 }
