@@ -18,7 +18,7 @@ import okhttp3.Route;
  * This class will be called by okhttp upon receiving a 401 from the server which means we should
  * usually retry the request with a fresh token.
  * <p>
- * It is NOT called for during initially making a request. For that refer to
+ * It is NOT called during initially making a request. For that refer to
  * {@link AnonymousAuthInterceptor}.
  */
 public abstract class AnonymousAuthenticator implements Authenticator {

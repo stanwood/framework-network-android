@@ -15,6 +15,7 @@ import okhttp3.Response;
 
 public class AuthenticatedAuthInterceptor implements Interceptor {
 
+    @NonNull
     private final ConnectionState connectionState;
     @NonNull
     private final AuthenticationService authenticationService;

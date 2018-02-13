@@ -15,8 +15,12 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * This class is used by okhttp to anonymously authenticate requests.
+ */
 public class AnonymousAuthInterceptor implements Interceptor {
 
+    @NonNull
     private final ConnectionState connectionState;
     @NonNull
     private final AuthenticationService authenticationService;
