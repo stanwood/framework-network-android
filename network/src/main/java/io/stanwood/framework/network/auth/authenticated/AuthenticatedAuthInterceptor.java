@@ -13,6 +13,9 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * This class is used by okhttp to authenticate requests.
+ */
 public class AuthenticatedAuthInterceptor implements Interceptor {
 
     @NonNull

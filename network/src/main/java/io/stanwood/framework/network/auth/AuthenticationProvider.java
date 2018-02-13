@@ -2,6 +2,13 @@ package io.stanwood.framework.network.auth;
 
 import java.io.IOException;
 
+/**
+ * Main class to provide authentication information and means to sign out the user. Used by the
+ * various Authenticators and Interceptors.
+ * <br><br>
+ * Might be split up into three classes (anonymous -|> base <|- authenticated) in the future to
+ * better separate implementations
+ */
 public interface AuthenticationProvider {
 
     /**
