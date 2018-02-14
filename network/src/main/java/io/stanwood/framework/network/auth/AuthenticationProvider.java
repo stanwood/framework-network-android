@@ -2,7 +2,14 @@ package io.stanwood.framework.network.auth;
 
 import java.io.IOException;
 
-public interface AuthenticationService {
+/**
+ * Main class to provide authentication information and means to sign out the user. Used by the
+ * various Authenticators and Interceptors.
+ * <br><br>
+ * Might be split up into three classes (anonymous -|> base <|- authenticated) in the future to
+ * better separate implementations
+ */
+public interface AuthenticationProvider {
 
     /**
      * Lock used by anonymous Authenticator / Auth Interceptor when requesting tokens. Provide a
@@ -22,7 +29,7 @@ public interface AuthenticationService {
      * @param forceRefresh whether a new token shall be retrieved from the server and not from cache
      * @return token
      */
-    String getToken(boolean forceRefresh);
+    String getAuthenticatedToken(boolean forceRefresh);
 
     /**
      * Retrieves a token for unauthenticated access

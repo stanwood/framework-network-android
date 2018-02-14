@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 
 import io.stanwood.framework.network.auth.AuthHeaderKeys;
-import io.stanwood.framework.network.auth.AuthenticationService;
+import io.stanwood.framework.network.auth.AuthenticationProvider;
 import io.stanwood.framework.network.auth.TokenReaderWriter;
 import io.stanwood.framework.network.auth.authenticated.AuthenticatedAuthenticator;
 import okhttp3.Authenticator;
@@ -25,7 +25,7 @@ import okhttp3.Route;
 public class AnonymousAuthenticator implements Authenticator {
 
     @NonNull
-    private final AuthenticationService authenticationService;
+    private final AuthenticationProvider authenticationProvider;
     @NonNull
     private final AnonymousAuthInterceptor anonymousAuthInterceptor;
     @Nullable
@@ -36,13 +36,13 @@ public class AnonymousAuthenticator implements Authenticator {
     private final OnAuthenticationFailedListener onAuthenticationFailedListener;
 
     public AnonymousAuthenticator(
-            @NonNull AuthenticationService authenticationService,
+            @NonNull AuthenticationProvider authenticationProvider,
             @NonNull AnonymousAuthInterceptor anonymousAuthInterceptor,
             @Nullable AuthenticatedAuthenticator authenticatedAuthenticator,
             @NonNull TokenReaderWriter tokenReaderWriter,
             @Nullable OnAuthenticationFailedListener onAuthenticationFailedListener
     ) {
-        this.authenticationService = authenticationService;
+        this.authenticationProvider = authenticationProvider;
         this.anonymousAuthInterceptor = anonymousAuthInterceptor;
         this.authenticatedAuthenticator = authenticatedAuthenticator;
         this.tokenReaderWriter = tokenReaderWriter;
@@ -52,7 +52,7 @@ public class AnonymousAuthenticator implements Authenticator {
     @Override
     public Request authenticate(@NonNull Route route, @NonNull Response response) throws IOException {
         Request request;
-        if (authenticatedAuthenticator != null && authenticationService.isUserSignedIn()) {
+        if (authenticatedAuthenticator != null && authenticationProvider.isUserSignedIn()) {
             // as we are already signed in we'll go ahead and try to log in with authentication
             final Request authenticatedRequest = authenticatedAuthenticator.authenticate(route, response);
             if (authenticatedRequest != null) {
@@ -62,7 +62,7 @@ public class AnonymousAuthenticator implements Authenticator {
                 at this point we've been signed out by the AuthenticatedAuthenticator due to some
                 unrecoverable error and we're trying again anonymously
                 */
-                request = anonymousAuthInterceptor.getRequest(response.request(), authenticationService);
+                request = anonymousAuthInterceptor.getRequest(response.request(), authenticationProvider);
             }
         } else {
             request = response.request();
@@ -71,22 +71,22 @@ public class AnonymousAuthenticator implements Authenticator {
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
             if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
-                synchronized (authenticationService.getAnonymousLock()) {
+                synchronized (authenticationProvider.getAnonymousLock()) {
                     String token;
                     try {
-                        token = authenticationService.getAnonymousToken(false);
+                        token = authenticationProvider.getAnonymousToken(false);
                     } catch (Exception e) {
                         throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                     }
 
                     if (oldToken.equals(token)) {
                         /*
-                        if the token we receive from the AuthenticationService hasn't changed in
+                        if the token we receive from the AuthenticationProvider hasn't changed in
                         the meantime (e.g. due to another request having triggered a 401 and
                         re-authenticating before us getting here), try to get a new one
                         */
                         try {
-                            token = authenticationService.getAnonymousToken(true);
+                            token = authenticationProvider.getAnonymousToken(true);
                         } catch (Exception e) {
                             throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                         }

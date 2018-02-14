@@ -7,28 +7,35 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 
 import io.stanwood.framework.network.auth.AuthHeaderKeys;
-import io.stanwood.framework.network.auth.AuthenticationService;
+import io.stanwood.framework.network.auth.AuthenticationProvider;
 import io.stanwood.framework.network.auth.TokenReaderWriter;
 import okhttp3.Authenticator;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 
+/**
+ * This class will be called by okhttp upon receiving a 401 from the server which means we should
+ * usually retry the request with a fresh token.
+ * <p>
+ * It is NOT called during initially making a request. For that refer to
+ * {@link AuthenticatedAuthInterceptor}.
+ */
 public class AuthenticatedAuthenticator implements Authenticator {
 
     @NonNull
-    private final AuthenticationService authenticationService;
+    private final AuthenticationProvider authenticationProvider;
     @NonNull
     private final TokenReaderWriter tokenReaderWriter;
     @Nullable
     private final OnAuthenticationFailedListener onAuthenticationFailedListener;
 
     public AuthenticatedAuthenticator(
-            @NonNull AuthenticationService authenticationService,
+            @NonNull AuthenticationProvider authenticationProvider,
             @NonNull TokenReaderWriter tokenReaderWriter,
             @Nullable OnAuthenticationFailedListener onAuthenticationFailedListener
     ) {
-        this.authenticationService = authenticationService;
+        this.authenticationProvider = authenticationProvider;
         this.tokenReaderWriter = tokenReaderWriter;
         this.onAuthenticationFailedListener = onAuthenticationFailedListener;
     }
@@ -40,10 +47,10 @@ public class AuthenticatedAuthenticator implements Authenticator {
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
             if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
-                synchronized (authenticationService.getAuthenticatedLock()) {
+                synchronized (authenticationProvider.getAuthenticatedLock()) {
                     String token;
                     try {
-                        token = authenticationService.getToken(false);
+                        token = authenticationProvider.getAuthenticatedToken(false);
                     } catch (Exception e) {
                         // TODO should we sign out in this case as well?
                         throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
@@ -51,12 +58,12 @@ public class AuthenticatedAuthenticator implements Authenticator {
 
                     if (oldToken.equals(token)) {
                         /*
-                        if the token we receive from the AuthenticationService hasn't changed in
+                        if the token we receive from the AuthenticationProvider hasn't changed in
                         the meantime (e.g. due to another request having triggered a 401 and
                         re-authenticating before us getting here), try to get a new one
                         */
                         try {
-                            token = authenticationService.getToken(true);
+                            token = authenticationProvider.getAuthenticatedToken(true);
                         } catch (Exception e) {
                             throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                         }
@@ -70,8 +77,8 @@ public class AuthenticatedAuthenticator implements Authenticator {
                             token);
                 }
             } else {
-                if (authenticationService.isUserSignedIn()) {
-                    authenticationService.signOut();
+                if (authenticationProvider.isUserSignedIn()) {
+                    authenticationProvider.signOut();
                 }
                 return onAuthenticationFailed(request);
             }

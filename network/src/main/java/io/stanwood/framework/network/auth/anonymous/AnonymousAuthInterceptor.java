@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 
 import io.stanwood.framework.network.auth.AuthHeaderKeys;
-import io.stanwood.framework.network.auth.AuthenticationService;
+import io.stanwood.framework.network.auth.AuthenticationProvider;
 import io.stanwood.framework.network.auth.TokenReaderWriter;
 import io.stanwood.framework.network.auth.authenticated.AuthenticatedAuthInterceptor;
 import io.stanwood.framework.network.util.ConnectionState;
@@ -23,7 +23,7 @@ public class AnonymousAuthInterceptor implements Interceptor {
     @NonNull
     private final ConnectionState connectionState;
     @NonNull
-    private final AuthenticationService authenticationService;
+    private final AuthenticationProvider authenticationProvider;
     @Nullable
     private final AuthenticatedAuthInterceptor authenticatedAuthInterceptor;
     @NonNull
@@ -31,28 +31,28 @@ public class AnonymousAuthInterceptor implements Interceptor {
 
     public AnonymousAuthInterceptor(
             @NonNull Context applicationContext,
-            @NonNull AuthenticationService authenticationService,
+            @NonNull AuthenticationProvider authenticationProvider,
             @Nullable AuthenticatedAuthInterceptor authenticatedAuthInterceptor,
             @NonNull TokenReaderWriter tokenReaderWriter
     ) {
         this.connectionState = new ConnectionState(applicationContext);
-        this.authenticationService = authenticationService;
+        this.authenticationProvider = authenticationProvider;
         this.authenticatedAuthInterceptor = authenticatedAuthInterceptor;
         this.tokenReaderWriter = tokenReaderWriter;
     }
 
     Request getRequest(
             @NonNull Request request,
-            @NonNull AuthenticationService authenticationService
+            @NonNull AuthenticationProvider authenticationProvider
     ) throws IOException {
         final Request.Builder requestBuilder = request.newBuilder();
         request = tokenReaderWriter.removeToken(request);
 
         if (connectionState.isConnected()) {
             String token;
-            synchronized (authenticationService.getAnonymousLock()) {
+            synchronized (authenticationProvider.getAnonymousLock()) {
                 try {
-                    token = authenticationService.getAnonymousToken(false);
+                    token = authenticationProvider.getAnonymousToken(false);
                 } catch (Exception e) {
                     throw new IOException("Error while trying to retrieve Firebase auth token: " + e.getMessage(), e);
                 }
@@ -69,12 +69,12 @@ public class AnonymousAuthInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         if (authenticatedAuthInterceptor != null
-                && authenticationService.isUserSignedIn()
+                && authenticationProvider.isUserSignedIn()
                 && connectionState.isConnected()) {
             return authenticatedAuthInterceptor.intercept(chain);
         }
 
-        Request request = getRequest(chain.request(), authenticationService);
+        Request request = getRequest(chain.request(), authenticationProvider);
 
         return chain.proceed(request);
     }

@@ -14,7 +14,7 @@ public interface TokenReaderWriter {
      * Reads a token from a given request.
      * <br><br>
      * This is mainly used to compare the token we sent with the
-     * one we have available via the {@link AuthenticationService} to check whether it has changed
+     * one we have available via the {@link AuthenticationProvider} to check whether it has changed
      * since we issued the request or whether we should try to get a new token.
      * <br><br>
      * Note, that this is NOT to read the token the server returns you when requesting a new one!
