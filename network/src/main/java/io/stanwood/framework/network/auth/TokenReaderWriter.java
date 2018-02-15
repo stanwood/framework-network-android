@@ -1,5 +1,8 @@
 package io.stanwood.framework.network.auth;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import io.stanwood.framework.network.auth.anonymous.AnonymousAuthenticator;
 import okhttp3.Request;
 
@@ -20,8 +23,9 @@ public interface TokenReaderWriter {
      * Note, that this is NOT to read the token the server returns you when requesting a new one!
      *
      * @param request okhttp Request
-     * @return the token found in the request
+     * @return the token found in the request, {@code null} if there is no token
      */
+    @Nullable
     String read(Request request);
 
     /**
@@ -34,6 +38,7 @@ public interface TokenReaderWriter {
      * @param token the token to write
      * @return the Request with token
      */
+    @NonNull
     Request write(Request request, String token);
 
     /**
@@ -41,5 +46,6 @@ public interface TokenReaderWriter {
      * @param request okhttp Request
      * @return the Request without token
      */
+    @NonNull
     Request removeToken(Request request);
 }

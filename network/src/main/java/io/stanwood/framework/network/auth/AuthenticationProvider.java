@@ -29,7 +29,7 @@ public interface AuthenticationProvider {
      * @param forceRefresh whether a new token shall be retrieved from the server and not from cache
      * @return token
      */
-    String getAuthenticatedToken(boolean forceRefresh);
+    String getAuthenticatedToken(boolean forceRefresh) throws IOException;
 
     /**
      * Retrieves a token for unauthenticated access
