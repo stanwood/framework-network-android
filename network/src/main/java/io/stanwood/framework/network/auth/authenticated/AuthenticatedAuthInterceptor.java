@@ -44,9 +44,9 @@ public class AuthenticatedAuthInterceptor implements Interceptor {
 
         if (connectionState.isConnected()) {
             String token;
-            synchronized (authenticationProvider.getAuthenticatedLock()) {
+            synchronized (authenticationProvider.getLock()) {
                 try {
-                    token = authenticationProvider.getAuthenticatedToken(false);
+                    token = authenticationProvider.getToken(false);
                 } catch (Exception e) {
                     throw new IOException("Error while trying to retrieve Firebase auth token: " + e.getMessage(), e);
                 }

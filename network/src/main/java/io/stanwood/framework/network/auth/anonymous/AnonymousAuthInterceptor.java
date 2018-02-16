@@ -50,9 +50,9 @@ public class AnonymousAuthInterceptor implements Interceptor {
 
         if (connectionState.isConnected()) {
             String token;
-            synchronized (authenticationProvider.getAnonymousLock()) {
+            synchronized (authenticationProvider.getLock()) {
                 try {
-                    token = authenticationProvider.getAnonymousToken(false);
+                    token = authenticationProvider.getToken(false);
                 } catch (Exception e) {
                     throw new IOException("Error while trying to retrieve Firebase auth token: " + e.getMessage(), e);
                 }
