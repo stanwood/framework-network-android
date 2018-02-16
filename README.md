@@ -57,7 +57,7 @@ Then create an instance of `AuthenticatedAuthenticator`:
 AuthenticatedAuthenticator authenticatedAuthenticator = new AuthenticatedAuthenticator(
     authenticationProvider,
     tokenReaderWriter,
-    request -> Log.e("Authentication failed permanently!"
+    response -> Log.e("Authentication failed permanently!")
 );
 ```
 
@@ -90,6 +90,8 @@ Instead of the `Authenticated*` classes use the `Anonymous*` ones for authentica
 The constructors are nearly the same, but the `AnonymousAuthenticator` also accepts an optional instance of `AuthenticatedAuthenticator`.
 You can pass an instance here and the `AnonymousAuthenticator` will attempt to use the authenticated token if the user is signed in (determined via `AuthenticationProvider.isUserSignedIn()`).
 You can pass `null` here if you don't have means for authenticated authentication or your API doesn't support accessing certain endpoints with authenticated tokens.
+
+*Make sure to implement an own subclass of `AuthenticationProvider` and don't reuse a probably already existing one from the authenticated case!*
 
 #### _Auth_ tips and tricks
 
