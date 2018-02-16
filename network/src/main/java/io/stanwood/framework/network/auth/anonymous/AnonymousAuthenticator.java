@@ -71,10 +71,10 @@ public class AnonymousAuthenticator implements Authenticator {
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
             if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
-                synchronized (authenticationProvider.getAnonymousLock()) {
+                synchronized (authenticationProvider.getLock()) {
                     String token;
                     try {
-                        token = authenticationProvider.getAnonymousToken(false);
+                        token = authenticationProvider.getToken(false);
                     } catch (Exception e) {
                         throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                     }
@@ -86,7 +86,7 @@ public class AnonymousAuthenticator implements Authenticator {
                         re-authenticating before us getting here), try to get a new one
                         */
                         try {
-                            token = authenticationProvider.getAnonymousToken(true);
+                            token = authenticationProvider.getToken(true);
                         } catch (Exception e) {
                             throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                         }

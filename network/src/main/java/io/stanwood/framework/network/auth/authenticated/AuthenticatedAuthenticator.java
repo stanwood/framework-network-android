@@ -47,10 +47,10 @@ public class AuthenticatedAuthenticator implements Authenticator {
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
             if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
-                synchronized (authenticationProvider.getAuthenticatedLock()) {
+                synchronized (authenticationProvider.getLock()) {
                     String token;
                     try {
-                        token = authenticationProvider.getAuthenticatedToken(false);
+                        token = authenticationProvider.getToken(false);
                     } catch (Exception e) {
                         // TODO should we sign out in this case as well?
                         throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
@@ -63,7 +63,7 @@ public class AuthenticatedAuthenticator implements Authenticator {
                         re-authenticating before us getting here), try to get a new one
                         */
                         try {
-                            token = authenticationProvider.getAuthenticatedToken(true);
+                            token = authenticationProvider.getToken(true);
                         } catch (Exception e) {
                             throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
                         }
@@ -77,9 +77,6 @@ public class AuthenticatedAuthenticator implements Authenticator {
                             token);
                 }
             } else {
-                if (authenticationProvider.isUserSignedIn()) {
-                    authenticationProvider.signOut();
-                }
                 return onAuthenticationFailed(request);
             }
         }
