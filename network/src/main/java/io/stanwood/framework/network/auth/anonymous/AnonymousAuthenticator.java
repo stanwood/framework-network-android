@@ -100,7 +100,7 @@ public class AnonymousAuthenticator implements Authenticator {
                             token);
                 }
             } else {
-                return onAuthenticationFailed(request);
+                return onAuthenticationFailed(response);
             }
         }
 
@@ -110,22 +110,23 @@ public class AnonymousAuthenticator implements Authenticator {
     /**
      * Called upon ultimately failed authentication.
      * <br><br>
-     * The default implementation just returns {@code null} and thus cancels the request.
+     * The default implementation just returns {@code null} and thus cancels the request. You can
+     * return another Request here to attempt another try.
      *
-     * @return Request to be passed forward to okhttp
+     * @return Response containing the failed Request
      */
     @SuppressWarnings("WeakerAccess")
     @CallSuper
     @Nullable
-    protected Request onAuthenticationFailed(@NonNull Request request) {
+    protected Request onAuthenticationFailed(@NonNull Response response) {
         // Give up, we've already failed to authenticate even after refreshing the token.
         if (onAuthenticationFailedListener != null) {
-            onAuthenticationFailedListener.onAuthenticationFailed(request);
+            onAuthenticationFailedListener.onAuthenticationFailed(response);
         }
         return null;
     }
 
     public interface OnAuthenticationFailedListener {
-        void onAuthenticationFailed(@NonNull Request request);
+        void onAuthenticationFailed(@NonNull Response response);
     }
 }
