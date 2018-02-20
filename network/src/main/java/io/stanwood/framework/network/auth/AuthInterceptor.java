@@ -1,13 +1,10 @@
-package io.stanwood.framework.network.auth.authenticated;
+package io.stanwood.framework.network.auth;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
 
-import io.stanwood.framework.network.auth.AuthHeaderKeys;
-import io.stanwood.framework.network.auth.AuthenticationProvider;
-import io.stanwood.framework.network.auth.TokenReaderWriter;
 import io.stanwood.framework.network.util.ConnectionState;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -16,7 +13,7 @@ import okhttp3.Response;
 /**
  * This class is used by okhttp to authenticate requests.
  */
-public class AuthenticatedAuthInterceptor implements Interceptor {
+public class AuthInterceptor implements Interceptor {
 
     @NonNull
     private final ConnectionState connectionState;
@@ -25,7 +22,7 @@ public class AuthenticatedAuthInterceptor implements Interceptor {
     @NonNull
     private final TokenReaderWriter tokenReaderWriter;
 
-    public AuthenticatedAuthInterceptor(
+    public AuthInterceptor(
             @NonNull Context applicationContext,
             @NonNull AuthenticationProvider authenticationProvider,
             @NonNull TokenReaderWriter tokenReaderWriter
