@@ -1,4 +1,4 @@
-package io.stanwood.framework.network.auth.anonymous;
+package io.stanwood.framework.network.auth;
 
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -6,11 +6,6 @@ import android.support.annotation.Nullable;
 
 import java.io.IOException;
 
-import io.stanwood.framework.network.auth.AuthHeaderKeys;
-import io.stanwood.framework.network.auth.AuthenticationProvider;
-import io.stanwood.framework.network.auth.TokenReaderWriter;
-import io.stanwood.framework.network.auth.authenticated.AuthenticatedAuthenticator;
-import okhttp3.Authenticator;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
@@ -20,53 +15,30 @@ import okhttp3.Route;
  * usually retry the request with a fresh token.
  * <p>
  * It is NOT called during initially making a request. For that refer to
- * {@link AnonymousAuthInterceptor}.
+ * {@link AuthInterceptor}.
  */
-public class AnonymousAuthenticator implements Authenticator {
+public class Authenticator implements okhttp3.Authenticator {
 
     @NonNull
     private final AuthenticationProvider authenticationProvider;
-    @NonNull
-    private final AnonymousAuthInterceptor anonymousAuthInterceptor;
-    @Nullable
-    private final AuthenticatedAuthenticator authenticatedAuthenticator;
     @NonNull
     private final TokenReaderWriter tokenReaderWriter;
     @Nullable
     private final OnAuthenticationFailedListener onAuthenticationFailedListener;
 
-    public AnonymousAuthenticator(
+    public Authenticator(
             @NonNull AuthenticationProvider authenticationProvider,
-            @NonNull AnonymousAuthInterceptor anonymousAuthInterceptor,
-            @Nullable AuthenticatedAuthenticator authenticatedAuthenticator,
             @NonNull TokenReaderWriter tokenReaderWriter,
             @Nullable OnAuthenticationFailedListener onAuthenticationFailedListener
     ) {
         this.authenticationProvider = authenticationProvider;
-        this.anonymousAuthInterceptor = anonymousAuthInterceptor;
-        this.authenticatedAuthenticator = authenticatedAuthenticator;
         this.tokenReaderWriter = tokenReaderWriter;
         this.onAuthenticationFailedListener = onAuthenticationFailedListener;
     }
 
     @Override
     public Request authenticate(@NonNull Route route, @NonNull Response response) throws IOException {
-        Request request;
-        if (authenticatedAuthenticator != null && authenticationProvider.isUserSignedIn()) {
-            // as we are already signed in we'll go ahead and try to log in with authentication
-            final Request authenticatedRequest = authenticatedAuthenticator.authenticate(route, response);
-            if (authenticatedRequest != null) {
-                return authenticatedRequest;
-            } else {
-                /*
-                at this point we've been signed out by the AuthenticatedAuthenticator due to some
-                unrecoverable error and we're trying again anonymously
-                */
-                request = anonymousAuthInterceptor.getRequest(response.request(), authenticationProvider);
-            }
-        } else {
-            request = response.request();
-        }
+        Request request = response.request();
 
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {

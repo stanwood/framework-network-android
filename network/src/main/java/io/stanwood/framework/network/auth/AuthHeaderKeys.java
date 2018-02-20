@@ -1,10 +1,7 @@
 package io.stanwood.framework.network.auth;
 
-import io.stanwood.framework.network.auth.anonymous.AnonymousAuthInterceptor;
-import io.stanwood.framework.network.auth.anonymous.AnonymousAuthenticator;
-
 /**
- * A collection of header keys used by {@link AnonymousAuthInterceptor} AND {@link AnonymousAuthenticator}
+ * A collection of header keys used by {@link AuthInterceptor} AND {@link Authenticator}
  * as well as their signed-in variants.
  */
 @SuppressWarnings("WeakerAccess")
