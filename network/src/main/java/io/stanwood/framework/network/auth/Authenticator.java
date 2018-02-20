@@ -4,8 +4,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.io.IOException;
-
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
@@ -37,18 +35,24 @@ public class Authenticator implements okhttp3.Authenticator {
     }
 
     @Override
-    public Request authenticate(@NonNull Route route, @NonNull Response response) throws IOException {
+    public Request authenticate(@NonNull Route route, @NonNull Response response) {
         Request request = response.request();
 
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
             if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
                 synchronized (authenticationProvider.getLock()) {
+                    // Authentication failed. Try to re-authenticate with fresh token
                     String token;
                     try {
                         token = authenticationProvider.getToken(false);
-                    } catch (Exception e) {
-                        throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
+                    } catch (AuthenticationException e) {
+                        /*
+                        TODO as soon as the bug in okhttp as described in AuthenticationException
+                        has been resolved we're going to rethrow the exception here if retryOrFail()
+                        returns null
+                        */
+                        return retryOrFail(response);
                     }
 
                     if (oldToken.equals(token)) {
@@ -59,9 +63,19 @@ public class Authenticator implements okhttp3.Authenticator {
                         */
                         try {
                             token = authenticationProvider.getToken(true);
-                        } catch (Exception e) {
-                            throw new IOException("Error while trying to retrieve auth token: " + e.getMessage(), e);
+                        } catch (AuthenticationException e) {
+                            /*
+                            TODO as soon as the bug in okhttp as described in AuthenticationException
+                            has been resolved we're going to rethrow the exception here if retryOrFail()
+                            returns null
+                            */
+                            return retryOrFail(response);
                         }
+
+                        if (token == null) {
+                            return retryOrFail(response);
+                        }
+
                     }
 
                     return tokenReaderWriter.write(
@@ -72,33 +86,41 @@ public class Authenticator implements okhttp3.Authenticator {
                             token);
                 }
             } else {
-                return onAuthenticationFailed(response);
+                // Give up, we've already failed to authenticate even after refreshing the token.
+                return retryOrFail(response);
             }
         }
 
         return request;
     }
 
+    private Request retryOrFail(@NonNull Response response) {
+        Request request = onAuthenticationFailed(response);
+        if (request == null) {
+            if (onAuthenticationFailedListener != null) {
+                onAuthenticationFailedListener.onAuthenticationFailed(response);
+            }
+        }
+        return request;
+    }
+
     /**
      * Called upon ultimately failed authentication.
      * <br><br>
+     * Usually that means that we couldn't satisfy the challenge the server asked us for.
+     * <br><br>
      * The default implementation just returns {@code null} and thus cancels the request. You can
      * return another Request here to attempt another try.
+     * <br><br>
+     * When overriding make sure to provide measurements against endless loops.
      *
      * @return Response containing the failed Request
      */
     @SuppressWarnings("WeakerAccess")
     @CallSuper
     @Nullable
-    protected Request onAuthenticationFailed(@NonNull Response response) {
-        // Give up, we've already failed to authenticate even after refreshing the token.
-        if (onAuthenticationFailedListener != null) {
-            onAuthenticationFailedListener.onAuthenticationFailed(response);
-        }
+    protected Request onAuthenticationFailed(@SuppressWarnings("unused") @NonNull Response response) {
         return null;
     }
 
-    public interface OnAuthenticationFailedListener {
-        void onAuthenticationFailed(@NonNull Response response);
-    }
 }
