@@ -3,8 +3,6 @@ package io.stanwood.framework.network.auth;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.io.IOException;
-
 /**
  * Main class to provide authentication information and locks. Used by
  * Authenticators and Interceptors.
@@ -28,8 +26,8 @@ public interface AuthenticationProvider {
      * @param forceRefresh whether a new token shall be retrieved from the server and not from cache
      * @return token
      *
-     * @throws IOException if the token cannot be retrieved
+     * @throws AuthenticationException if the token cannot be retrieved
      */
     @Nullable
-    String getToken(boolean forceRefresh) throws IOException;
+    String getToken(boolean forceRefresh) throws AuthenticationException;
 }

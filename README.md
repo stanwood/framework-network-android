@@ -1,4 +1,5 @@
 [![Release](https://jitpack.io/v/stanwood/Network_android.svg?style=flat-square)](https://jitpack.io/#stanwood/Network_android)
+[![Build Status](https://www.bitrise.io/app/983e6342cc5e0e24/status.svg?token=QtXUf2lbVhJrANROaTkluQ)](https://www.bitrise.io/app/983e6342cc5e0e24)
 
 # stanwood Network Utilities (Android)
 
@@ -40,7 +41,8 @@ TODO
 
 ### auth
 
-The `auth` package contains classes for handling token based authentication with OkHttp. Generally this is done via Authenticators and Interceptors.
+The `auth` package contains classes for handling token based authentication with OkHttp. Generally this
+is done via Authenticators and Interceptors.
 
 Integration into both existing means of token retrieval as well as from scratch is simple.
 
@@ -78,4 +80,25 @@ new OkHttpClient.Builder()
 
 That's it. When using this `OkHttpClient` instance you'll benefit from fully transparent token handling.
 
-*If your app uses multiple authentication methods make sure to implement an own subclass of `AuthenticationProvider` for each method and use an own `OkHttpClient` for each!*
+*If your app uses multiple authentication methods make sure to implement an own subclass of `AuthenticationProvider`
+for each method and use an own `OkHttpClient` for each!*
+
+#### A note on authentication exception handling
+
+The library provides an own exception class called `AuthenticationException`. You can listen for this
+class in your Retrofit `Callback.onFailure(Call, Throwable)` to check for authentication related
+errors.
+
+However up until now we are not able to fire this exception everywhere - especially the
+`Authenticator` suffers from a likely [okhttp bug](https://github.com/square/okhttp/issues/3872)
+which prevents us from firing exceptions there. In case of errors you will receive a `NullPointerException`
+instead which probably won't help you much for automated handling as this exception is basically
+caused by every interceptor/authenticator returning `null` for the expected Request/Response.
+
+For the time being we recommend to take a best effort approach here and additionally check for 401 response code
+in Retrofit's `Callback.onSuccess()` for when an issue in the Authenticator occured (if there was no
+issue you won't get a 401 propagated to `Callback.onSuccess()` as in case of successful authentication
+after receiving a 401 for the initial request your callback will get the response code of the following
+originally intended request).
+
+We're looking forward to streamlining this as soon as the okhttp bug has been resolved.
