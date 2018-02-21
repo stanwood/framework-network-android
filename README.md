@@ -1,4 +1,5 @@
 [![Release](https://jitpack.io/v/stanwood/Network_android.svg?style=flat-square)](https://jitpack.io/#stanwood/Network_android)
+[![Build Status](https://www.bitrise.io/app/983e6342cc5e0e24/status.svg?token=QtXUf2lbVhJrANROaTkluQ)](https://www.bitrise.io/app/983e6342cc5e0e24)
 
 # stanwood Network Utilities (Android)
 
