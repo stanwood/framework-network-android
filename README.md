@@ -1,4 +1,4 @@
-[![Release](https://jitpack.io/v/stanwood/Network_android.svg?style=flat-square)](https://jitpack.io/#stanwood/Network_android)
+[![Release](https://jitpack.io/v/stanwood/framework-network-android.svg?style=flat-square)](https://jitpack.io/#stanwood/framework-network-android)
 [![Build Status](https://www.bitrise.io/app/983e6342cc5e0e24/status.svg?token=QtXUf2lbVhJrANROaTkluQ)](https://www.bitrise.io/app/983e6342cc5e0e24)
 
 # stanwood Network Utilities (Android)
@@ -24,7 +24,7 @@ Then add this to you app's `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation 'com.github.stanwood:Network_android:<insert latest version here>' // aar version available as well
+    implementation 'com.github.stanwood:framework-network-android:<insert latest version here>' // aar version available as well
 }
 ```
 
