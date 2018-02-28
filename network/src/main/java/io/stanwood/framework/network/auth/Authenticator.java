@@ -1,6 +1,5 @@
 package io.stanwood.framework.network.auth;
 
-import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -52,7 +51,7 @@ public class Authenticator implements okhttp3.Authenticator {
                             has been resolved we're going to rethrow the exception here if retryOrFail()
                             returns null
                             */
-                            return retryOrFail(response);
+                            return retryOrFail(route, response);
                         }
 
                         if (oldToken.equals(token)) {
@@ -69,11 +68,11 @@ public class Authenticator implements okhttp3.Authenticator {
                                 has been resolved we're going to rethrow the exception here if retryOrFail()
                                 returns null
                                 */
-                                return retryOrFail(response);
+                                return retryOrFail(route, response);
                             }
 
                             if (token == null) {
-                                return retryOrFail(response);
+                                return retryOrFail(route, response);
                             }
 
                         }
@@ -86,7 +85,7 @@ public class Authenticator implements okhttp3.Authenticator {
                                 token);
                 } else {
                     // Give up, we've already failed to authenticate even after refreshing the token.
-                    return retryOrFail(response);
+                    return retryOrFail(route, response);
                 }
             }
         }
@@ -94,8 +93,8 @@ public class Authenticator implements okhttp3.Authenticator {
         return request;
     }
 
-    private Request retryOrFail(@NonNull Response response) {
-        Request request = onAuthenticationFailed(response);
+    private Request retryOrFail(@NonNull Route route, @NonNull Response response) {
+        Request request = onAuthenticationFailed(route, response);
         if (request == null) {
             if (onAuthenticationFailedListener != null) {
                 onAuthenticationFailedListener.onAuthenticationFailed(response);
@@ -120,7 +119,10 @@ public class Authenticator implements okhttp3.Authenticator {
      */
     @SuppressWarnings("WeakerAccess")
     @Nullable
-    protected Request onAuthenticationFailed(@SuppressWarnings("unused") @NonNull Response response) {
+    protected Request onAuthenticationFailed(
+            @SuppressWarnings("unused") @NonNull Route route,
+            @SuppressWarnings("unused") @NonNull Response response
+    ) {
         return null;
     }
 
