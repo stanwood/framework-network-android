@@ -112,12 +112,13 @@ public class Authenticator implements okhttp3.Authenticator {
      * The default implementation just returns {@code null} and thus cancels the request. You can
      * return another Request here to attempt another try.
      * <br><br>
-     * When overriding make sure to provide measurements against endless loops.
+     * When overriding make sure to provide measurements against endless loops, this is usually
+     * done by adding headers to the request - by no means try to store information in the
+     * Authenticator as the same instance is used throughout ALL requests.
      *
      * @return Response containing the failed Request
      */
     @SuppressWarnings("WeakerAccess")
-    @CallSuper
     @Nullable
     protected Request onAuthenticationFailed(@SuppressWarnings("unused") @NonNull Response response) {
         return null;
