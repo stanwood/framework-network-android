@@ -40,29 +40,12 @@ public class Authenticator implements okhttp3.Authenticator {
 
         String oldToken = tokenReaderWriter.read(request);
         if (oldToken != null) {
-            if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
-                synchronized (authenticationProvider.getLock()) {
-                    // Authentication failed. Try to re-authenticate with fresh token
-                    String token;
-                    try {
-                        token = authenticationProvider.getToken(false);
-                    } catch (AuthenticationException e) {
-                        /*
-                        TODO as soon as the bug in okhttp as described in AuthenticationException
-                        has been resolved we're going to rethrow the exception here if retryOrFail()
-                        returns null
-                        */
-                        return retryOrFail(response);
-                    }
-
-                    if (oldToken.equals(token)) {
-                        /*
-                        if the token we receive from the AuthenticationProvider hasn't changed in
-                        the meantime (e.g. due to another request having triggered a 401 and
-                        re-authenticating before us getting here), try to get a new one
-                        */
+            synchronized (authenticationProvider.getLock()) {
+                if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
+                        // Authentication failed. Try to re-authenticate with fresh token
+                        String token;
                         try {
-                            token = authenticationProvider.getToken(true);
+                            token = authenticationProvider.getToken(false);
                         } catch (AuthenticationException e) {
                             /*
                             TODO as soon as the bug in okhttp as described in AuthenticationException
@@ -72,22 +55,39 @@ public class Authenticator implements okhttp3.Authenticator {
                             return retryOrFail(response);
                         }
 
-                        if (token == null) {
-                            return retryOrFail(response);
+                        if (oldToken.equals(token)) {
+                            /*
+                            if the token we receive from the AuthenticationProvider hasn't changed in
+                            the meantime (e.g. due to another request having triggered a 401 and
+                            re-authenticating before us getting here), try to get a new one
+                            */
+                            try {
+                                token = authenticationProvider.getToken(true);
+                            } catch (AuthenticationException e) {
+                                /*
+                                TODO as soon as the bug in okhttp as described in AuthenticationException
+                                has been resolved we're going to rethrow the exception here if retryOrFail()
+                                returns null
+                                */
+                                return retryOrFail(response);
+                            }
+
+                            if (token == null) {
+                                return retryOrFail(response);
+                            }
+
                         }
 
-                    }
-
-                    return tokenReaderWriter.write(
-                            tokenReaderWriter.removeToken(
-                                    request.newBuilder()
-                                            .removeHeader(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY)
-                                            .build()),
-                            token);
+                        return tokenReaderWriter.write(
+                                tokenReaderWriter.removeToken(
+                                        request.newBuilder()
+                                                .removeHeader(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY)
+                                                .build()),
+                                token);
+                } else {
+                    // Give up, we've already failed to authenticate even after refreshing the token.
+                    return retryOrFail(response);
                 }
-            } else {
-                // Give up, we've already failed to authenticate even after refreshing the token.
-                return retryOrFail(response);
             }
         }
 
