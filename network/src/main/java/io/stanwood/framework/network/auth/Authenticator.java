@@ -94,7 +94,19 @@ public class Authenticator implements okhttp3.Authenticator {
     }
 
     private Request retryOrFail(@NonNull Route route, @NonNull Response response) {
-        Request request = onAuthenticationFailed(route, response);
+        Request request = onAuthenticationFailed(
+                route,
+                /*
+                make sure the RetryWithRefresh header is set so that subclasses overriding
+                onAuthenticationFailed() can call through to authenticate() after e.g. clearing
+                all tokens
+                */
+                response.newBuilder().request(
+                        response.request().newBuilder()
+                                .header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY, "true")
+                                .build()
+                ).build()
+        );
         if (request == null) {
             if (onAuthenticationFailedListener != null) {
                 onAuthenticationFailedListener.onAuthenticationFailed(response);
