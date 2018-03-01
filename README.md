@@ -101,4 +101,8 @@ issue you won't get a 401 propagated to `Callback.onSuccess()` as in case of suc
 after receiving a 401 for the initial request your callback will get the response code of the following
 originally intended request).
 
+Additionally/alternatively you can always subclass the `Authenticator` class and override
+`onAuthenticationFailed()` if you want to trigger special handling for failed authentication from
+which we couldn't recover with our default handling.
+
 We're looking forward to streamlining this as soon as the okhttp bug has been resolved.
