@@ -75,7 +75,7 @@ public class Authenticator implements okhttp3.Authenticator {
                                 return retryOrFail(route, response);
                             }
 
-                            if (token == null) {
+                            if (token == null || oldToken.equals(token)) {
                                 return retryOrFail(route, response);
                             }
 
