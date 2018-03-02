@@ -101,8 +101,15 @@ issue you won't get a 401 propagated to `Callback.onSuccess()` as in case of suc
 after receiving a 401 for the initial request your callback will get the response code of the following
 originally intended request).
 
-Additionally/alternatively you can always subclass the `Authenticator` class and override
+If you're having problems retrieving a token in the `AuthenticationProvider` (e.g. due to an invalid
+refresh token) always try to resolve those issues there as well if possible. Throwing an
+`AuthenticationException` should just be a last resort.
+
+Alternatively you can also subclass the `Authenticator` class and override
 `onAuthenticationFailed()` if you want to trigger special handling for failed authentication from
-which we couldn't recover with our default handling.
+which we couldn't recover with our default handling. This usually tends to be a bit harder to get
+right as it expects you to modify the failed request directly without any means of intercepting the
+response. Thus handling token retrieval issues should preferably handled in the `AuthenticationProvider`
+as explained above.
 
 We're looking forward to streamlining this as soon as the okhttp bug has been resolved.

@@ -44,6 +44,11 @@ public class Authenticator implements okhttp3.Authenticator {
                         // Authentication failed. Try to re-authenticate with fresh token
                         String token;
                         try {
+                            /*
+                            do not force refresh the token as we might already have gotten a new
+                            one due to another request having triggered a 401 and re-authenticating
+                            before us getting here
+                            */
                             token = authenticationProvider.getToken(false);
                         } catch (AuthenticationException e) {
                             /*
@@ -57,8 +62,7 @@ public class Authenticator implements okhttp3.Authenticator {
                         if (oldToken.equals(token)) {
                             /*
                             if the token we receive from the AuthenticationProvider hasn't changed in
-                            the meantime (e.g. due to another request having triggered a 401 and
-                            re-authenticating before us getting here), try to get a new one
+                            the meantime, try to get a new one
                             */
                             try {
                                 token = authenticationProvider.getToken(true);
@@ -71,7 +75,7 @@ public class Authenticator implements okhttp3.Authenticator {
                                 return retryOrFail(route, response);
                             }
 
-                            if (token == null) {
+                            if (token == null || oldToken.equals(token)) {
                                 return retryOrFail(route, response);
                             }
 
