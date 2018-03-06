@@ -32,7 +32,7 @@ import okhttp3.Response;
  * accepting a list of parameter keys instead of just the one of the auth parameter.
  *
  * <p>Configuration of the interceptor classes is mainly done by means of request headers. Check
- * out {@link HeaderKeys} for more details on what the different headers do.
+ * out {@link CacheHeaderKeys} for more details on what the different headers do.
  *
  * <p>Add it as a network interceptor to your OkHttpClient Builder like so:
  * <pre>
@@ -51,7 +51,7 @@ public class CacheNetworkInterceptor implements Interceptor {
      * @param queryAuthParameterKey the name of any auth query parameter to be removed before caching
      *                             or {@code null} if there is none
      * @param cacheForSeconds seconds for which we should generally cache in case the
-     *                       {@link HeaderKeys#APPLY_RESPONSE_CACHE} is set
+     *                       {@link CacheHeaderKeys#APPLY_RESPONSE_CACHE} is set
      */
     public CacheNetworkInterceptor(@Nullable String queryAuthParameterKey, long cacheForSeconds) {
         this.queryAuthParameterKey = queryAuthParameterKey;
@@ -61,8 +61,8 @@ public class CacheNetworkInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
-        String responseCacheHeader = request.header(HeaderKeys.APPLY_RESPONSE_CACHE);
-        String offlineCacheHeader = request.header(HeaderKeys.APPLY_OFFLINE_CACHE);
+        String responseCacheHeader = request.header(CacheHeaderKeys.APPLY_RESPONSE_CACHE);
+        String offlineCacheHeader = request.header(CacheHeaderKeys.APPLY_OFFLINE_CACHE);
         boolean isGeneralCache = Boolean.valueOf(responseCacheHeader);
         boolean isOfflineCache = Boolean.valueOf(offlineCacheHeader);
         if (isGeneralCache || isOfflineCache) {
