@@ -80,8 +80,9 @@ new OkHttpClient.Builder()
 
 That's it. When using this `OkHttpClient` instance you'll benefit from fully transparent token handling.
 
-*If your app uses multiple authentication methods make sure to implement an own subclass of `AuthenticationProvider`
-for each method and use an own `OkHttpClient` for each!*
+__Hint 1:__ *If your app uses multiple authentication methods make sure to implement an own subclass of `AuthenticationProvider` for each method and use an own `OkHttpClient` for each!*
+
+__Hint 2:__ *In case you are using OkHttp/Retrofit to retrieve tokens: As the `Authenticator` locks all other `Authenticators` and `AuthInterceptors` with the same `AuthenticationProvider` it makes sense to provide an own `OkHttpClient` instance (and thus also an own Retrofit instance if you use it) for all calls you need to receive new tokens. If try to serve all calls with the same client instance, it may happen that you run out of connections/threads while trying to get a token because there might be a whole slew of requests already waiting for that token call to succeed. Alternatively you can also try to increase the executor pool size, but this is not recommended as you never know for sure how many requests are executed at a given point in time - and you definitely always want a thread ready for your token request.*
 
 #### A note on authentication exception handling
 
