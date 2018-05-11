@@ -5,7 +5,11 @@ package io.stanwood.framework.network.auth;
  * as well as their signed-in variants.
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class AuthHeaderKeys {
+public class AuthHeaderKeys {
+
+    private AuthHeaderKeys() {
+        throw new IllegalStateException("Utility class, not meant to be instantiated");
+    }
 
     /**
      * This header is set by the Authenticators / Auth Interceptors to determine when to retry a
