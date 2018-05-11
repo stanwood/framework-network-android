@@ -60,6 +60,7 @@ In the future optional modules will provide implementations for common use
 cases.
 
 Then create an instance of `io.stanwood.framework.network.auth.Authenticator`:
+
 ```java
 Authenticator authenticator = new Authenticator(
     authenticationProvider,
@@ -69,6 +70,7 @@ Authenticator authenticator = new Authenticator(
 ```
 
 And an instance of `AuthInterceptor`:
+
 ```java
 AuthInterceptor authInterceptor = new AuthInterceptor(
     appContext,
@@ -78,6 +80,7 @@ AuthInterceptor authInterceptor = new AuthInterceptor(
 ```
 
 Construct an `OkHttpClient` and pass the interceptor and the authenticator:
+
 ```java
 new OkHttpClient.Builder()
         .authenticator(authenticator)
