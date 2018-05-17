@@ -7,7 +7,11 @@ package io.stanwood.framework.network.cache;
  * Add any combination of these headers to your requests and the interceptors will pick them up.
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class CacheHeaderKeys {
+public class CacheHeaderKeys {
+
+    private CacheHeaderKeys() {
+        throw new IllegalStateException("Utility class, not meant to be instantiated");
+    }
 
     /**
      * Allows caching this request for offline usage. That doesn't mean it is used as online cache.
