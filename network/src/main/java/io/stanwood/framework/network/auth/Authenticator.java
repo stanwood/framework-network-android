@@ -111,10 +111,8 @@ public class Authenticator implements okhttp3.Authenticator {
                                 .build()
                 ).build()
         );
-        if (request == null) {
-            if (onAuthenticationFailedListener != null) {
-                onAuthenticationFailedListener.onAuthenticationFailed(response);
-            }
+        if (request == null && onAuthenticationFailedListener != null) {
+            onAuthenticationFailedListener.onAuthenticationFailed(response);
         }
         return request;
     }
