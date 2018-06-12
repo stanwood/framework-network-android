@@ -3,6 +3,9 @@ package com.github.ubuntudroid.sample;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+/**
+ * Sample activity.
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
