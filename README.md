@@ -91,6 +91,8 @@ new OkHttpClient.Builder()
 That's it. When using this `OkHttpClient` instance you'll benefit from fully
 transparent token handling.
 
+Remember that you usually will have to retrieve the initial token (after user triggered login) on your own outside of the `AuthenticationProvider`. Usually you will store the token then in e.g. the `SharedPreferences` and later try to retrieve them in your `AuthenticationProvider`s `getToken()` method - unless `forceRefresh()` is set.
+
 __Hint 1:__ *If your app uses multiple authentication methods make sure to
 implement an own subclass of `AuthenticationProvider` for each method and use
 an own `OkHttpClient` for each!*
@@ -106,6 +108,10 @@ already waiting for that token call to succeed. Alternatively you can also try
 to increase the executor pool size, but this is not recommended as you never
 know for sure how many requests are executed at a given point in time - and you
 definitely always want a thread ready for your token request.*
+
+__Hint 3:__ *Rules of thumb (exceptions apply):* 
+1. one `AuthenticationProvider` per authentication method (however you can also try to wrap multiple ones in one `AuthenticationProvider` which can ease DI quite a bit - we recommend to define each method in one provider and then pass those providers to the wrapper provider to have clean separate implementations)
+2. one `TokenReaderWriter` per Api
 
 #### A note on authentication exception handling
 
