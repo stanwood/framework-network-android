@@ -56,7 +56,7 @@ public class Authenticator implements okhttp3.Authenticator {
     }
 
     @Override
-    public Request authenticate(@NonNull Route route, @NonNull Response response) {
+    public Request authenticate(@Nullable Route route, @NonNull Response response) {
         Request request = response.request();
 
         String oldToken = tokenReaderWriter.read(request);
@@ -119,7 +119,7 @@ public class Authenticator implements okhttp3.Authenticator {
         return request;
     }
 
-    private Request retryOrFail(@NonNull Route route, @NonNull Response response) {
+    private Request retryOrFail(@Nullable Route route, @NonNull Response response) {
         Request request = onAuthenticationFailed(
                 route,
                 /*
@@ -156,7 +156,7 @@ public class Authenticator implements okhttp3.Authenticator {
     @SuppressWarnings("WeakerAccess")
     @Nullable
     protected Request onAuthenticationFailed(
-            @SuppressWarnings("unused") @NonNull Route route,
+            @SuppressWarnings("unused") @Nullable Route route,
             @SuppressWarnings("unused") @NonNull Response response
     ) {
         return null;
