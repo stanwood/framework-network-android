@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2018 stanwood GmbH
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.stanwood.framework.network.auth;
 
 import android.support.annotation.NonNull;
@@ -34,7 +56,7 @@ public class Authenticator implements okhttp3.Authenticator {
     }
 
     @Override
-    public Request authenticate(@NonNull Route route, @NonNull Response response) {
+    public Request authenticate(@Nullable Route route, @NonNull Response response) {
         Request request = response.request();
 
         String oldToken = tokenReaderWriter.read(request);
@@ -97,7 +119,7 @@ public class Authenticator implements okhttp3.Authenticator {
         return request;
     }
 
-    private Request retryOrFail(@NonNull Route route, @NonNull Response response) {
+    private Request retryOrFail(@Nullable Route route, @NonNull Response response) {
         Request request = onAuthenticationFailed(
                 route,
                 /*
@@ -134,7 +156,7 @@ public class Authenticator implements okhttp3.Authenticator {
     @SuppressWarnings("WeakerAccess")
     @Nullable
     protected Request onAuthenticationFailed(
-            @SuppressWarnings("unused") @NonNull Route route,
+            @SuppressWarnings("unused") @Nullable Route route,
             @SuppressWarnings("unused") @NonNull Response response
     ) {
         return null;
