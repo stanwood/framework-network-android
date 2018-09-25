@@ -1,6 +1,7 @@
 [![Release](https://jitpack.io/v/stanwood/framework-network-android.svg?style=flat-square)](https://jitpack.io/#stanwood/framework-network-android)
 [![Build Status](https://app.bitrise.io/app/983e6342cc5e0e24/status.svg?token=QtXUf2lbVhJrANROaTkluQ&branch=develop)](https://app.bitrise.io/app/983e6342cc5e0e24)
 [![Maintainability](https://api.codeclimate.com/v1/badges/eeed4b740670c5753217/maintainability)](https://codeclimate.com/github/stanwood/framework-network-android/maintainability)
+[![API](https://img.shields.io/badge/API-16%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=16)
 
 # stanwood Network Utilities (Android)
 
