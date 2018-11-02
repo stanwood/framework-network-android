@@ -52,7 +52,6 @@ class AuthInterceptor(
                         onAuthenticationFailed()
                         throw e
                     }
-
                 }
 
                 it.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY, "true")
