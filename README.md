@@ -1,6 +1,5 @@
 [![Release](https://jitpack.io/v/stanwood/framework-network-android.svg?style=flat-square)](https://jitpack.io/#stanwood/framework-network-android)
 [![Build Status](https://app.bitrise.io/app/983e6342cc5e0e24/status.svg?token=QtXUf2lbVhJrANROaTkluQ&branch=develop)](https://app.bitrise.io/app/983e6342cc5e0e24)
-[![Maintainability](https://api.codeclimate.com/v1/badges/eeed4b740670c5753217/maintainability)](https://codeclimate.com/github/stanwood/framework-network-android/maintainability)
 [![API](https://img.shields.io/badge/API-16%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=16)
 
 # stanwood Network Utilities (Android)
@@ -151,3 +150,21 @@ handling token retrieval issues should preferably handled in the
 
 We're looking forward to streamlining this as soon as the okhttp bug has been
 resolved.
+
+## Contribute
+
+This project follows the [Android Kotlin Code Style](https://android.github.io/kotlin-guides/style.html)
+for all Kotlin classes (exception: line length = 140, please adapt your IDE settings accordingly). We use
+[ktlint](https://github.com/shyiko/ktlint) for automated checks.
+
+Install ktlint on your machine like described in their [manual](https://github.com/shyiko/ktlint#installation).
+
+Then configure the pre-commit hook like so:
+
+```
+ktlint --install-git-pre-commit-hook
+```
+
+Make sure to check the _Run Git hooks_ checkbox if you commit via Android Studio.
+The CI will test this as well in the future and won't allow non style conform commits to be merged
+into develop.

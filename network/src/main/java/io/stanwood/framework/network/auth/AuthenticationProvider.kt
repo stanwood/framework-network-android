@@ -20,35 +20,32 @@
  * SOFTWARE.
  */
 
-package io.stanwood.framework.network.auth;
-
-import java.io.IOException;
+package io.stanwood.framework.network.auth
 
 /**
- * Exception class used by {@link AuthInterceptor} and in the future by {@link Authenticator} to
- * indicate issues during token retrieval.
- * <br><br>
- * Right now we cannot use this for the Authenticator due to a likely
- * <a href="https://github.com/square/okhttp/issues/3872">bug in okhttp</a> which keeps the
- * connection open when throwing exceptions in Authenticators.
+ * Main class to provide authentication information and locks. Used by
+ * Authenticators and Interceptors.
+ *
+ * Implement one for each authentication method!
  */
-public class AuthenticationException extends IOException {
+interface AuthenticationProvider {
 
-    public static final String DEFAULT_MESSAGE = "Error while trying to retrieve auth token";
+    /**
+     * Lock used by Authenticator / Auth Interceptor when requesting tokens. Provide a
+     * final static Object here.
+     *
+     * @return lock
+     */
+    val lock: Any
 
-    public AuthenticationException() {
-        super(DEFAULT_MESSAGE);
-    }
-
-    public AuthenticationException(String message) {
-        super(message);
-    }
-
-    public AuthenticationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AuthenticationException(Throwable cause) {
-        super(DEFAULT_MESSAGE, cause);
-    }
+    /**
+     * Retrieves a token for authenticated access
+     *
+     * @param forceRefresh whether a new token shall be retrieved from the server and not from cache
+     * @return token
+     *
+     * @throws AuthenticationException if the token cannot be retrieved
+     */
+    @Throws(AuthenticationException::class)
+    fun getToken(forceRefresh: Boolean): String
 }

@@ -20,22 +20,19 @@
  * SOFTWARE.
  */
 
-package io.stanwood.framework.network.auth;
+package io.stanwood.framework.network.auth
+
+import okhttp3.Response
 
 /**
- * A collection of header keys used by {@link AuthInterceptor} AND {@link Authenticator}
- * as well as their signed-in variants.
+ * Listener for ultimately failed authentication.
  */
-@SuppressWarnings("WeakerAccess")
-public class AuthHeaderKeys {
-
-    private AuthHeaderKeys() {
-        throw new IllegalStateException("Utility class, not meant to be instantiated");
-    }
-
+interface OnAuthenticationFailedListener {
     /**
-     * This header is set by the Authenticators / Auth Interceptors to determine when to retry a
-     * request with a fresh token.
+     * Called upon ultimately failed authentication.
+     *
+     * @param response the Response indicating failure or `null` if the issue arose before we
+     * got a response
      */
-    public static final String RETRY_WITH_REFRESH_HEADER_KEY = "RetryWithRefresh";
+    fun onAuthenticationFailed(response: Response?)
 }
