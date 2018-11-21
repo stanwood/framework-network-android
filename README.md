@@ -50,9 +50,7 @@ implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
 implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
 
-implementation "com.google.code.gson:gson:2.8.2"
-
-implementation 'com.nytimes.android:store3:3.1.0'
+implementation 'com.google.code.gson:gson:2.8.2'
 
 implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
 ```
