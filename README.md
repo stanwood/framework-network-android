@@ -38,6 +38,99 @@ use them. Right now there are solutions for the following use cases:
 - handle offline situations and caching when using OkHttp (`cache` package)
 - generic token based authentication handling with OkHttp (`auth` package)
 
+## Quick start for simple networking in stanwood apps
+
+You can find an example [over here](https://github.com/stanwood/architecture_sample_github_android) (private for now).
+
+Add the following dependencies (replace versions here with current versions):
+
+```groovy
+def retrofit_version = '2.4.0'
+implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+
+implementation 'com.google.code.gson:gson:2.8.2'
+
+implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+```
+
+Write an interface class with Retrofit API definition and put it in the `datasources.net.<api>` package:
+
+```kotlin
+interface GithubApi {
+
+    @Headers(
+        "Accept: application/vnd.github.mercy-preview+json"
+    )
+    @GET("search/repositories")
+    fun getMostPopularAndroidRepositories(
+        @Query("q") query: String = "topic:Android",
+        @Query("sort") sort: String = "stars",
+        @Query("order") order: String = "desc"
+    ): Single<SearchRepositoriesResponse>  // this is for RX
+}
+```
+
+To define models classes use curl or postman or insomnia to execute the request and get a sample response. Then use the _JSON to Kotlin Class_ Android Studio plugin and paste the response there. We use GSON for de-/serialization of JSON so use the proper annotation settings in the plugin. Configure the plugin so that it uses `val`s and try the _Auto determine Nullable or not from JSON Value_ setting (make sure to revisit the generated classes later to check whether the properties are fine). Additionally switch on _Enable Map Type when JSON field key is primitive type_ in _other_ settings.
+
+Put the generated classes in the `datasources.net.<api>.model` package.
+
+Then define a `NetworkModule` similar to the following one:
+
+```kotlin
+@Module
+class NetworkModule {
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = GsonBuilder()
+        .setDateFormat("YYYY-MM-DDTHH:MM:SSZ")
+        .create()
+
+    @Provides
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BASIC
+        }
+
+    @Provides
+    fun provideGithubOkHttpClient(
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        application: Application
+    ): OkHttpClient {
+        val client = OkHttpClient.Builder()
+            .readTimeout(TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .connectTimeout(TIMEOUT_MS, TimeUnit.MILLISECONDS)
+            .cache(Cache(application.cacheDir, CACHE_SIZE))
+            .addInterceptor(TestfairyHttpInterceptor()) // only if you use the stanwood analytics library
+
+        if (BuildConfig.DEBUG) {
+            client.addInterceptor(httpLoggingInterceptor)
+        }
+
+        return client.build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGithubRetrofit(
+        okHttpClient: OkHttpClient,
+        gson: Gson
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.GITHUB_API)
+        .client(okHttpClient)
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+        
+    @Provides
+    fun provideGithubApi(retrofit: Retrofit): GithubApi = retrofit.create(GithubApi::class.java)
+}
+```
+
+Add the `NetworkModule` as an _include_ to your `AppModule` and you can start injecting your API class to perform network requests.
+
 ### cache
 
 TODO
