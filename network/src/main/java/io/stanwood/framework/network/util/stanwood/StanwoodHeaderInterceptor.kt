@@ -11,6 +11,12 @@ import okhttp3.Response
  * ```
  * okHttpClientBuilder.addInterceptor(StanwoodHeaderInterceptor(...))
  * ```
+ *
+ * @param appName a **language independent** app identifier, it will be snail cased in the User-Agent header. Usually it is supplied via
+ * either `application.getString(R.string.app_name)` (if language independent) or the flavor or a static `BuildConfig` String
+ * @param versionName your app's version, usually as supplied by `BuildConfig.VERSION_NAME`
+ * @param buildType your app's build type (like _debug_ or _release_) as supplied by `BuildConfig.BUILD_TYPE`
+ *
  */
 class StanwoodHeaderInterceptor(
     private val appName: String,
