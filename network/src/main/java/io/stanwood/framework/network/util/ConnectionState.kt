@@ -20,23 +20,19 @@
  * SOFTWARE.
  */
 
-package io.stanwood.framework.network.util;
+package io.stanwood.framework.network.util
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.Context
+import android.net.ConnectivityManager
 
-public class ConnectionState {
+class ConnectionState(applicationContext: Context) {
 
-    private ConnectivityManager connectivityManager;
+    private val connectivityManager: ConnectivityManager =
+        applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    public ConnectionState(Context applicationContext) {
-        connectivityManager = (ConnectivityManager) applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-    }
-
-    public boolean isConnected() {
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-    }
-
+    val isConnected: Boolean
+        get() =
+            connectivityManager.activeNetworkInfo.let {
+                it != null && it.isConnectedOrConnecting
+            }
 }

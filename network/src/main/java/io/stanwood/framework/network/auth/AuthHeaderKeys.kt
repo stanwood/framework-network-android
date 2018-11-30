@@ -20,36 +20,24 @@
  * SOFTWARE.
  */
 
-package io.stanwood.framework.network.auth;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+package io.stanwood.framework.network.auth
 
 /**
- * Main class to provide authentication information and locks. Used by
- * Authenticators and Interceptors.
- * <br><br>
- * Implement one for each authentication method!
+ * A collection of header keys used by [AuthInterceptor] AND [Authenticator]
+ * as well as their signed-in variants.
  */
-public interface AuthenticationProvider {
+class AuthHeaderKeys private constructor() {
 
-    /**
-     * Lock used by Authenticator / Auth Interceptor when requesting tokens. Provide a
-     * final static Object here.
-     *
-     * @return lock
-     */
-    @NonNull
-    Object getLock();
+    init {
+        throw IllegalStateException("Utility class, not meant to be instantiated")
+    }
 
-    /**
-     * Retrieves a token for authenticated access
-     *
-     * @param forceRefresh whether a new token shall be retrieved from the server and not from cache
-     * @return token
-     *
-     * @throws AuthenticationException if the token cannot be retrieved
-     */
-    @Nullable
-    String getToken(boolean forceRefresh) throws AuthenticationException;
+    companion object {
+
+        /**
+         * This header is set by the Authenticators / Auth Interceptors to determine when to retry a
+         * request with a fresh token.
+         */
+        const val RETRY_WITH_REFRESH_HEADER_KEY = "RetryWithRefresh"
+    }
 }

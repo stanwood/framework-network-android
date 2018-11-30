@@ -20,21 +20,23 @@
  * SOFTWARE.
  */
 
-package io.stanwood.framework.network.auth;
+package io.stanwood.framework.network.auth
 
-import android.support.annotation.Nullable;
-
-import okhttp3.Response;
+import java.io.IOException
 
 /**
- * Listener for ultimately failed authentication.
+ * Exception class used by [AuthInterceptor] and in the future by [Authenticator] to
+ * indicate issues during token retrieval.
+ *
+ * Right now we cannot use this for the Authenticator due to a likely
+ * [bug in okhttp](https://github.com/square/okhttp/issues/3872) which keeps the
+ * connection open when throwing exceptions in Authenticators.
  */
-public interface OnAuthenticationFailedListener {
-    /**
-     * Called upon ultimately failed authentication.
-     *
-     * @param response the Response indicating failure or {@code null} if the issue arose before we
-     *                 got a response
-     */
-    void onAuthenticationFailed(@Nullable Response response);
+class AuthenticationException(message: String = DEFAULT_MESSAGE, cause: Throwable? = null) :
+    IOException(message, cause) {
+
+    companion object {
+
+        private const val DEFAULT_MESSAGE = "Error while trying to retrieve auth token"
+    }
 }
