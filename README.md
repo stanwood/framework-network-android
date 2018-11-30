@@ -37,6 +37,7 @@ use them. Right now there are solutions for the following use cases:
 
 - handle offline situations and caching when using OkHttp (`cache` package)
 - generic token based authentication handling with OkHttp (`auth` package)
+- generic network related utility classes (some specific to apps developed over here at _stanwood_)
 
 ## Quick start for simple networking in stanwood apps
 
@@ -104,6 +105,12 @@ class NetworkModule {
             .connectTimeout(TIMEOUT_MS, TimeUnit.MILLISECONDS)
             .cache(Cache(application.cacheDir, CACHE_SIZE))
             .addInterceptor(TestfairyHttpInterceptor()) // only if you use the stanwood analytics library
+            .addInterceptor(StanwoodHeaderInterceptor(
+                // make sure that app name is language independent, maybe use a flavor or a static BuildConfig String
+                application.getString(R.string.app_name),
+                BuildConfig.VERSION_NAME,
+                BuildConfig.BUILD_TYPE
+            )
 
         if (BuildConfig.DEBUG) {
             client.addInterceptor(httpLoggingInterceptor)
@@ -243,6 +250,11 @@ handling token retrieval issues should preferably handled in the
 
 We're looking forward to streamlining this as soon as the okhttp bug has been
 resolved.
+
+## util
+
+The `util` package contains generic network related classes. The `util.stanwood`
+package contains classes for apps developed over here at _stanwood_.
 
 ## Contribute
 
