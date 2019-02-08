@@ -19,32 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package io.stanwood.framework.network.retrofit
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import okhttp3.ResponseBody
+import okio.BufferedSource
+import retrofit2.Converter
+import retrofit2.Retrofit
+import java.lang.reflect.Type
 
-buildscript {
-    ext.kotlin_version = '1.3.21'
-    repositories {
-        google()
-        jcenter()
+class BufferedSourceConverterFactory : Converter.Factory() {
+
+    override fun responseBodyConverter(
+        type: Type,
+        annotations: Array<Annotation>,
+        retrofit: Retrofit
+    ): Converter<ResponseBody, *>? =
+        if (BufferedSource::class.java.canonicalName != (type as Class<*>).canonicalName) {
+            null
+        } else {
+            Converter<ResponseBody, BufferedSource> { value -> value.source() }
+        }
+
+    companion object {
+        fun create() = BufferedSourceConverterFactory()
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
