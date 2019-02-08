@@ -1,4 +1,4 @@
-package io.stanwood.framework.network.util.stanwood
+package io.stanwood.framework.network.interceptor
 
 import okhttp3.Interceptor
 import okhttp3.Response
