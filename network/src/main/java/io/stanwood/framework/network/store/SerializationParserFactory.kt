@@ -32,5 +32,4 @@ object SerializationParserFactory {
     fun <T> createSourceParser(deserializer: KSerializer<T>): Parser<BufferedSource, T> = SerializationSourceParser(deserializer)
 
     fun <T> createStringParser(deserializer: KSerializer<T>): Parser<String, T> = SerializationStringParser(deserializer)
-
 }
