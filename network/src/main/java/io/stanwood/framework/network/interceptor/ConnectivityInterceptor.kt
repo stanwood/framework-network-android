@@ -19,33 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package io.stanwood.framework.network.interceptor
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import android.app.Application
+import io.stanwood.framework.network.util.ConnectionState
+import io.stanwood.framework.network.util.NoConnectivityException
+import okhttp3.Interceptor
+import okhttp3.Response
+import java.io.IOException
 
-buildscript {
-    ext.kotlin_version = '1.3.21'
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+class ConnectivityInterceptor(context: Application) : Interceptor {
+    private val connectionState = ConnectionState(context)
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response =
+        connectionState.isConnected.let {
+            if (it) {
+                chain.proceed(chain.request())
+            } else {
+                throw NoConnectivityException()
+            }
+        }
 }
