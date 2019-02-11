@@ -33,6 +33,6 @@ class ConnectionState(applicationContext: Context) {
     val isConnected: Boolean
         get() =
             connectivityManager.activeNetworkInfo.let {
-                it != null && it.isConnectedOrConnecting
+                it != null && it.isConnected
             }
 }
