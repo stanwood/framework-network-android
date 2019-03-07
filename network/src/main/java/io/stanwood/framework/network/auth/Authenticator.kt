@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 stanwood GmbH
+ * Copyright (c) 2019 stanwood GmbH
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,12 +51,9 @@ open class Authenticator(
                         */
                         authenticationProvider.getToken(false)
                     } catch (e: AuthenticationException) {
-                        /*
-                        TODO as soon as the bug in okhttp as described in AuthenticationException
-                        has been resolved we're going to rethrow the exception here if retryOrFail()
-                        returns null
-                        */
-                        return retryOrFail(route, response)
+                        retryOrFail(route, response)?.let {
+                            return it
+                        } ?: throw e
                     }.takeIf { oldToken != it }?.let {
                         try {
                             /*
@@ -68,12 +65,9 @@ open class Authenticator(
                                 .takeUnless { newToken -> oldToken == newToken }
                                 ?: return retryOrFail(route, response)
                         } catch (e: AuthenticationException) {
-                            /*
-                            TODO as soon as the bug in okhttp as described in AuthenticationException
-                            has been resolved we're going to rethrow the exception here if retryOrFail()
-                            returns null
-                            */
-                            return retryOrFail(route, response)
+                            retryOrFail(route, response)?.let {
+                                return it
+                            } ?: throw e
                         }
                     }.let { newToken ->
                         tokenReaderWriter.write(

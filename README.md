@@ -121,21 +121,6 @@ You can listen for this class in your Retrofit
 `Callback.onFailure(Call, Throwable)` to check for authentication related
 errors.
 
-However up until now we are not able to fire this exception everywhere -
-especially the `Authenticator` suffers from a likely
-[okhttp bug](https://github.com/square/okhttp/issues/3872) which prevents us
-from firing exceptions there. In case of errors you will receive a
-`NullPointerException` instead which probably won't help you much for automated
-handling as this exception is basically caused by every
-interceptor/authenticator returning `null` for the expected Request/Response.
-
-For the time being we recommend to take a best effort approach here and
-additionally check for 401 response code in Retrofit's `Callback.onSuccess()`
-for when an issue in the Authenticator occured (if there was no issue you won't
-get a 401 propagated to `Callback.onSuccess()` as in case of successful
-authentication after receiving a 401 for the initial request your callback will
-get the response code of the following originally intended request).
-
 If you're having problems retrieving a token in the `AuthenticationProvider`
 (e.g. due to an invalid refresh token) always try to resolve those issues there
 as well if possible. Throwing an `AuthenticationException` should just be a
