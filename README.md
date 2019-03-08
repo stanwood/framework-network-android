@@ -149,14 +149,14 @@ You can find an example [over here](https://github.com/stanwood/architecture_sam
 Add the following dependencies (replace versions here with current versions):
 
 ```groovy
-def retrofit_version = '2.4.0'
+def retrofit_version = '2.5.0'
 implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
 implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
 
-implementation 'com.google.code.gson:gson:2.8.2'
+implementation 'com.google.code.gson:gson:2.8.5'
 
-implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+implementation 'com.squareup.okhttp3:logging-interceptor:3.13.1'
 ```
 
 Write an interface class with Retrofit API definition and put it in the `datasources.net.<api>` package:
