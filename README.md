@@ -66,7 +66,7 @@ Then create an instance of `io.stanwood.framework.network.auth.Authenticator`:
 Authenticator authenticator = new Authenticator(
     authenticationProvider,
     tokenReaderWriter,
-    response -> Log.e("Authentication failed permanently!")
+    null
 );
 ```
 
@@ -74,9 +74,10 @@ And an instance of `AuthInterceptor`:
 
 ```java
 AuthInterceptor authInterceptor = new AuthInterceptor(
-    appContext,
+    new ConnectionState(appContext),
     authenticationProvider,
-    tokenReaderWriter
+    tokenReaderWriter,
+    null
 );
 ```
 
