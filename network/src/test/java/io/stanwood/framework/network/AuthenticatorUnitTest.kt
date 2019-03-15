@@ -9,6 +9,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
+import io.mockk.verify
 import io.stanwood.framework.network.api.TestApi
 import io.stanwood.framework.network.auth.AuthInterceptor
 import io.stanwood.framework.network.auth.AuthenticationException
@@ -20,7 +21,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Retrofit
@@ -55,8 +55,40 @@ class AuthenticatorUnitTest {
         RESTMockServer.shutdown()
     }
 
+    // TODO TokenReaderWriter and AuthenticationProvider mocks with simple implementations
+
+    @Test
+    fun `When request fails with 401 and getting a token with refreshing succeeds the request is done with the new token`() {
+        whenGET(pathEndsWith("/user"))
+                .thenReturnEmpty(401)
+                .thenReturnString("{ \"data\": \"bla\" }")
+        every { connectionState.isConnected } returns true
+        every { tokenReaderWriter.read(any()) } returns "some_token"
+        slot<Request>().let { request ->
+            every { tokenReaderWriter.removeToken(capture(request)) } answers { request.captured }
+        }
+        slot<Request>().let { request ->
+            every { tokenReaderWriter.write(capture(request), any()) } answers { request.captured }
+        }
+        authenticationProvider.apply {
+            every { getToken(false) } returns "some_token"
+            every { getToken(true) } returns "new_token"
+            every { lock } returns Unit
+        }
+
+        val authenticator = Authenticator(authenticationProvider, tokenReaderWriter, null)
+        val authInterceptor =
+                AuthInterceptor(connectionState, authenticationProvider, tokenReaderWriter, null)
+        getApi(authenticator, authInterceptor).getUser().execute()
+
+        verify {
+            tokenReaderWriter.write(any(), "some_token")
+            tokenReaderWriter.write(any(), "new_token")
+        }
+    }
+
     @Test(expected = AuthenticationException::class)
-    fun `When request fails with 401 and reauth fails with 401 as well we get an AuthenticationException`() {
+    fun `When request fails with 401 and getting a token without refreshing fails as well we get an AuthenticationException`() {
         whenGET(pathEndsWith("/user")).thenReturnEmpty(401)
         every { connectionState.isConnected } returns true
         every { tokenReaderWriter.read(any()) } returns "some_token"
@@ -66,18 +98,36 @@ class AuthenticatorUnitTest {
         slot<Request>().let { request ->
             every { tokenReaderWriter.write(capture(request), any()) } answers { request.captured }
         }
-        every { authenticationProvider.getToken(any()) } returns "some_token" andThenThrows AuthenticationException()
-        every { authenticationProvider.lock } returns Unit
+        authenticationProvider.apply {
+            every { getToken(false) } returns "some_token" andThenThrows AuthenticationException()
+            every { lock } returns Unit
+        }
         val authenticator = Authenticator(authenticationProvider, tokenReaderWriter, null)
         val authInterceptor =
                 AuthInterceptor(connectionState, authenticationProvider, tokenReaderWriter, null)
         getApi(authenticator, authInterceptor).getUser().execute()
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun addition_isCorrect() {
-        assertEquals(4, (2 + 2).toLong())
+    @Test(expected = AuthenticationException::class)
+    fun `When request fails with 401 and getting a token with refreshing fails as well we get an AuthenticationException`() {
+        whenGET(pathEndsWith("/user")).thenReturnEmpty(401)
+        every { connectionState.isConnected } returns true
+        every { tokenReaderWriter.read(any()) } returns "some_token"
+        slot<Request>().let { request ->
+            every { tokenReaderWriter.removeToken(capture(request)) } answers { request.captured }
+        }
+        slot<Request>().let { request ->
+            every { tokenReaderWriter.write(capture(request), any()) } answers { request.captured }
+        }
+        authenticationProvider.apply {
+            every { getToken(false) } returns "some_token"
+            every { getToken(true) } throws AuthenticationException()
+            every { lock } returns Unit
+        }
+        val authenticator = Authenticator(authenticationProvider, tokenReaderWriter, null)
+        val authInterceptor =
+                AuthInterceptor(connectionState, authenticationProvider, tokenReaderWriter, null)
+        getApi(authenticator, authInterceptor).getUser().execute()
     }
 
     private fun getApi(authenticator: Authenticator, authInterceptor: AuthInterceptor) =

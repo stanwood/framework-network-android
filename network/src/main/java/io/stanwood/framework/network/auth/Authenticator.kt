@@ -54,20 +54,23 @@ open class Authenticator(
                         retryOrFail(route, response)?.let {
                             return it
                         } ?: throw e
-                    }.takeIf { oldToken != it }?.let {
-                        try {
-                            /*
-                            if the token we receive from the AuthenticationProvider hasn't changed in
-                            the meantime, try to get a fresh one
-                            */
-                            authenticationProvider
-                                .getToken(true)
-                                .takeUnless { newToken -> oldToken == newToken }
-                                ?: return retryOrFail(route, response)
-                        } catch (e: AuthenticationException) {
-                            retryOrFail(route, response)?.let {
-                                return it
-                            } ?: throw e
+                    }.let {
+                        when (it) {
+                            oldToken -> try {
+                                /*
+                                if the token we receive from the AuthenticationProvider hasn't changed in
+                                the meantime, try to get a fresh one
+                                */
+                                authenticationProvider
+                                        .getToken(true)
+                                        .takeUnless { newToken -> oldToken == newToken }
+                                        ?: return retryOrFail(route, response)
+                            } catch (e: AuthenticationException) {
+                                retryOrFail(route, response)?.let { request ->
+                                    return request
+                                } ?: throw e
+                            }
+                            else -> it
                         }
                     }.let { newToken ->
                         tokenReaderWriter.write(
