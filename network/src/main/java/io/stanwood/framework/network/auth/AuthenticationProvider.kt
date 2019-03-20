@@ -24,7 +24,8 @@ package io.stanwood.framework.network.auth
 
 /**
  * Main class to provide authentication information and locks. Used by
- * Authenticators and Interceptors.
+ * Authenticators and Interceptors. Also use this class during initial authentication
+ * (i.e right after the user logs in or registers).
  *
  * Implement one for each authentication method!
  */
@@ -39,7 +40,20 @@ interface AuthenticationProvider {
     val lock: Any
 
     /**
-     * Retrieves a token for authenticated access
+     * Synchronously retrieves a token for authenticated access. MUST be run on a background thread
+     * (which automatically is the case when this is called via the Authenticator or AuthInterceptor).
+     *
+     * A typical implementation usually looks like this:
+     *
+     * 1. check if we are the correct AuthenticationProvider for the currently used Authentication method
+     * 2. check if there is already valid authentication data stored somewhere and use it if `forceRefresh`
+     * isn't set
+     * 3. otherwise get a fresh token synchronously and store it in the token storage.
+     *
+     * You can get a simple (non-encrypted!) token storage implementation when using the
+     * [stanwood Android Plugin](https://github.com/stanwood/android-studio-plugin/).
+     * The plugin will provide you with a basic implementation of such `AuthManager` by running
+     * the _NetworkModule_ assistant in the _New -> Stanwood_ menu.
      *
      * @param forceRefresh whether a new token shall be retrieved from the server and not from cache
      * @return token
