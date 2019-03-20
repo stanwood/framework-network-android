@@ -22,7 +22,6 @@
 
 package io.stanwood.framework.network.auth
 
-import android.content.Context
 import io.stanwood.framework.network.util.ConnectionState
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -32,14 +31,12 @@ import java.io.IOException
  * This class is used by okhttp to authenticate requests.
  */
 class AuthInterceptor(
-    applicationContext: Context,
-    private val authenticationProvider: AuthenticationProvider,
-    private val tokenReaderWriter: TokenReaderWriter,
-    private val onAuthenticationFailedListener: OnAuthenticationFailedListener?
+        private val connectionState: ConnectionState,
+        private val authenticationProvider: AuthenticationProvider,
+        private val tokenReaderWriter: TokenReaderWriter,
+        private val onAuthenticationFailedListener: OnAuthenticationFailedListener?
 
 ) : Interceptor {
-
-    private val connectionState: ConnectionState = ConnectionState(applicationContext)
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response =

@@ -66,7 +66,7 @@ Then create an instance of `io.stanwood.framework.network.auth.Authenticator`:
 Authenticator authenticator = new Authenticator(
     authenticationProvider,
     tokenReaderWriter,
-    response -> Log.e("Authentication failed permanently!")
+    null
 );
 ```
 
@@ -74,9 +74,10 @@ And an instance of `AuthInterceptor`:
 
 ```java
 AuthInterceptor authInterceptor = new AuthInterceptor(
-    appContext,
+    new ConnectionState(appContext),
     authenticationProvider,
-    tokenReaderWriter
+    tokenReaderWriter,
+    null
 );
 ```
 
@@ -121,21 +122,6 @@ You can listen for this class in your Retrofit
 `Callback.onFailure(Call, Throwable)` to check for authentication related
 errors.
 
-However up until now we are not able to fire this exception everywhere -
-especially the `Authenticator` suffers from a likely
-[okhttp bug](https://github.com/square/okhttp/issues/3872) which prevents us
-from firing exceptions there. In case of errors you will receive a
-`NullPointerException` instead which probably won't help you much for automated
-handling as this exception is basically caused by every
-interceptor/authenticator returning `null` for the expected Request/Response.
-
-For the time being we recommend to take a best effort approach here and
-additionally check for 401 response code in Retrofit's `Callback.onSuccess()`
-for when an issue in the Authenticator occured (if there was no issue you won't
-get a 401 propagated to `Callback.onSuccess()` as in case of successful
-authentication after receiving a 401 for the initial request your callback will
-get the response code of the following originally intended request).
-
 If you're having problems retrieving a token in the `AuthenticationProvider`
 (e.g. due to an invalid refresh token) always try to resolve those issues there
 as well if possible. Throwing an `AuthenticationException` should just be a
@@ -164,14 +150,14 @@ You can find an example [over here](https://github.com/stanwood/architecture_sam
 Add the following dependencies (replace versions here with current versions):
 
 ```groovy
-def retrofit_version = '2.4.0'
+def retrofit_version = '2.5.0'
 implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
 implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
 
-implementation 'com.google.code.gson:gson:2.8.2'
+implementation 'com.google.code.gson:gson:2.8.5'
 
-implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+implementation 'com.squareup.okhttp3:logging-interceptor:3.13.1'
 ```
 
 Write an interface class with Retrofit API definition and put it in the `datasources.net.<api>` package:
