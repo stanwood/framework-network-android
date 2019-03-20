@@ -41,23 +41,19 @@ use them. Right now there are solutions for the following use cases:
 
 ### cache
 
-TODO
+See javadoc of the classes in the package.
 
 ### auth
 
-The `auth` package contains classes for handling token based authentication
-with OkHttp. Generally this is done via Authenticators and Interceptors.
+The `auth` package contains classes for handling token based authentication with OkHttp. Generally this is done via Authenticators and Interceptors.
+
+If you are using plain username/password authentication you obviously won't need the following classes as there will never be a need to refresh the data and authentication is straightforward.
 
 Integration into both existing means of token retrieval as well as from scratch is simple.
 
-First you need to implement both `TokenReaderWriter` and
-`AuthenticationProvider`. The first is used for reading and writing tokens
-from/to requests. The second provides means to get authentication data (such as
-tokens and sign-in status). Refer to the javadoc for more details on how to
-implement these interfaces.
+First you need to implement both `TokenReaderWriter` and `AuthenticationProvider`. The first is used for reading (to find out whether we are still using an old token) and writing (for authentication) tokens from/to requests. The second provides means to get authentication data (such as tokens and sign-in status) and should also be used by you directly during initial authentication (i.e. right after user log-in/registration) for consistency reasons. The `AuthenticationProvider` usually makes use of an `AuthManager` to store retrieved login data. You can get a sample implementation of such an `AuthManager` by using the _stanwood Android Studio Plugin_ (see **AuthManager** section further below). Refer to the javadoc of the aforementioned classes for more details on how to implement these interfaces.
 
-In the future optional modules will provide implementations for common use
-cases.
+In the future optional modules will provide implementations for common use cases.
 
 Then create an instance of `io.stanwood.framework.network.auth.Authenticator`:
 
@@ -84,15 +80,12 @@ Construct an `OkHttpClient` and pass the interceptor and the authenticator:
 
 ```java
 new OkHttpClient.Builder()
-        .authenticator(authenticator)
-        .addInterceptor(authInterceptor)
+        .authenticator(authenticator) // takes care of 401 (invalid token, get fresh one and retry)
+        .addInterceptor(authInterceptor) // adds authentication data to every request
         .build();
 ```
 
-That's it. When using this `OkHttpClient` instance you'll benefit from fully
-transparent token handling.
-
-Remember that you usually will have to retrieve the initial token (after user triggered login) on your own outside of the `AuthenticationProvider`. Usually you will store the token then in e.g. the `SharedPreferences` and later try to retrieve them in your `AuthenticationProvider`s `getToken()` method - unless `forceRefresh()` is set.
+That's it. When using this `OkHttpClient` instance you'll benefit from fully transparent token handling.
 
 __Hint 1:__ *If your app uses multiple authentication methods make sure to
 implement an own subclass of `AuthenticationProvider` for each method and use
@@ -112,7 +105,7 @@ definitely always want a thread ready for your token request.*
 
 __Hint 3:__ *Rules of thumb (exceptions apply):* 
 1. one `AuthenticationProvider` per authentication method (however you can also try to wrap multiple ones in one `AuthenticationProvider` which can ease DI quite a bit - we recommend to define each method in one provider and then pass those providers to the wrapper provider to have clean separate implementations)
-2. one `TokenReaderWriter` per Api
+2. one `TokenReaderWriter` and `AuthManager` per Api
 
 #### A note on authentication exception handling
 
