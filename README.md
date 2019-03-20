@@ -48,8 +48,7 @@ TODO
 The `auth` package contains classes for handling token based authentication
 with OkHttp. Generally this is done via Authenticators and Interceptors.
 
-Integration into both existing means of token retrieval as well as from scratch
-is simple.
+Integration into both existing means of token retrieval as well as from scratch is simple.
 
 First you need to implement both `TokenReaderWriter` and
 `AuthenticationProvider`. The first is used for reading and writing tokens
@@ -135,8 +134,11 @@ failed request directly without any means of intercepting the response. Thus
 handling token retrieval issues should preferably handled in the
 `AuthenticationProvider` as explained above.
 
-We're looking forward to streamlining this as soon as the okhttp bug has been
-resolved.
+### AuthManager
+
+The [stanwood Android Plugin](https://github.com/stanwood/android-studio-plugin/) provides a template for an `AuthManager` which takes care of storing and providing authentication info like tokens and usernames. It will automatically be generated for you when running the _NetworkModule_ assistant in the _New -> Stanwood_ menu.
+
+You can extend it with authentication types for all your authentication providers for easy and streamlined authentication state handling.
 
 ## util
 
