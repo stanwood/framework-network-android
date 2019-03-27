@@ -19,35 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package io.stanwood.framework.network.core.store
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import com.nytimes.android.external.store3.base.Parser
+import com.nytimes.android.external.store3.util.ParserException
+import kotlinx.io.Reader
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 
-buildscript {
-    ext.kotlin_version = '1.3.21'
-    ext.okhttp_version = '3.13.1'
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
-        maven { url "https://jitpack.io" }
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+class SerializationReaderParser<Parsed>(private val deserializer: KSerializer<Parsed>) : Parser<Reader, Parsed> {
+    @Throws(ParserException::class)
+    override fun apply(reader: Reader): Parsed =
+        Json.nonstrict.parse(deserializer, reader.use { it.readText() })
 }
