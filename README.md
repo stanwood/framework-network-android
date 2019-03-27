@@ -26,7 +26,9 @@ Then add this to you app's `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation 'com.github.stanwood:framework-network-android:<insert latest version here>' // aar version available as well
+    implementation 'com.github.stanwood.framework-network-android:arch:<insert latest version here>' // aar version available as well
+    implementation 'com.github.stanwood.framework-network-android:cache:<insert latest version here>' // aar version available as well
+    implementation 'com.github.stanwood.framework-network-android:core:<insert latest version here>' // aar version available as well, automatically included when pulling in one of the other libraries
 }
 ```
 
@@ -35,17 +37,17 @@ dependencies {
 Refer to the extensive javadoc of the provided classes for details on how to
 use them. Right now there are solutions for the following use cases:
 
-- handle offline situations and caching when using OkHttp (`cache` package)
-- generic token based authentication handling with OkHttp (`auth` package)
-- generic network related utility classes (some specific to apps developed over here at _stanwood_)
+- handle offline situations and caching when using OkHttp (`cache` library)
+- generic token based authentication handling with OkHttp (`auth` library)
+- generic network related utility classes (some specific to apps developed over here at _stanwood_) (`core`library)
 
 ### cache
 
-See javadoc of the classes in the package.
+See javadoc of the classes in the library.
 
 ### auth
 
-The `auth` package contains classes for handling token based authentication with OkHttp. Generally this is done via Authenticators and Interceptors.
+The `auth` library contains classes for handling token based authentication with OkHttp. Generally this is done via Authenticators and Interceptors.
 
 If you are using plain username/password authentication you obviously won't need the following classes as there will never be a need to refresh the data and authentication is straightforward.
 
@@ -127,13 +129,13 @@ failed request directly without any means of intercepting the response. Thus
 handling token retrieval issues should preferably handled in the
 `AuthenticationProvider` as explained above.
 
-### AuthManager
+#### AuthManager
 
 The [stanwood Android Plugin](https://github.com/stanwood/android-studio-plugin/) provides a template for an `AuthManager` which takes care of storing and providing authentication info like tokens and usernames. It will automatically be generated for you when running the _NetworkModule_ assistant in the _New -> Stanwood_ menu.
 
 You can extend it with authentication types for all your authentication providers for easy and streamlined authentication state handling.
 
-## util
+### core
 
 The `util` package contains generic network related classes. The `util.stanwood`
 package contains classes for apps developed over here at _stanwood_.

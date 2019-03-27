@@ -20,4 +20,4 @@
  * SOFTWARE.
  */
 
-include ':network', ':sample'
+include ':auth', ':sample', ':cache', ':core'
