@@ -23,5 +23,4 @@ package io.stanwood.framework.network.core.util
 
 import java.io.IOException
 
-
-class NoConnectivityException :  IOException("no connection")
+class NoConnectivityException : IOException("no connection")
