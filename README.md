@@ -242,17 +242,20 @@ Add the `NetworkModule` as an _include_ to your `AppModule` and you can start in
 ## Contribute
 
 This project follows the [Android Kotlin Code Style](https://android.github.io/kotlin-guides/style.html)
-for all Kotlin classes (exception: line length = 140, please adapt your IDE settings accordingly). We use
+for all Kotlin classes. We use
 [ktlint](https://github.com/shyiko/ktlint) for automated checks.
 
-Install ktlint on your machine like described in their [manual](https://github.com/shyiko/ktlint#installation).
+The [ktlint-gradle-plugin](https://github.com/JLLeitschuh/ktlint-gradle) is already integrated into this project which means you need nearly no setup on your end.
 
-Then configure the pre-commit hook like so:
+Just execute those two calls to configure your IDE *for this project* and add a pre-commit hook to do the checking (and if necessary formatting for you).
 
+```bash
+./gradlew ktlintApplyToIdea
+./gradlew addKtlintFormatGitPreCommitHook
 ```
-ktlint --install-git-pre-commit-hook
-```
 
-Make sure to check the _Run Git hooks_ checkbox if you commit via Android Studio.
-The CI will test this as well in the future and won't allow non style conform commits to be merged
-into develop.
+Make sure to check the _Run Git hooks_ checkbox if you commit via Android Studio (should be set by default).
+
+Last thing to do is setting line length to 140 (Preferences -> Editor -> Code Style) - unfortunately `ktlintApplyToIdea` can't do that for you.
+
+The CI will check formatting as well and won't allow non style conform commits to be merged.
