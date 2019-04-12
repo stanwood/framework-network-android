@@ -81,7 +81,6 @@ public class CacheInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
-
         String offlineCacheHeader = request.header(CacheHeaderKeys.APPLY_OFFLINE_CACHE);
         if (Boolean.valueOf(offlineCacheHeader) && !connectionState.isConnected()) {
             Request.Builder builder = request.newBuilder();
