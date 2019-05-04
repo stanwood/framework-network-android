@@ -26,8 +26,8 @@ import com.nytimes.android.external.store3.util.ParserException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-class SerializationStringParser<Parsed>(private val deserializer: KSerializer<Parsed>) : Parser<String, Parsed> {
+class SerializationStringParser<Parsed>(private val deserializer: KSerializer<Parsed>,val json:Json) : Parser<String, Parsed> {
     @Throws(ParserException::class)
     override fun apply(string: String): Parsed =
-        Json.nonstrict.parse(deserializer, string)
+        json.parse(deserializer, string)
 }
