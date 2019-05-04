@@ -57,8 +57,8 @@ dependencies {
     api "com.squareup.okhttp3:okhttp:$okhttp_version"
     compileOnly 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.10.0"
-    api 'com.nytimes.android:store3:3.1.0'
-    api 'com.nytimes.android:filesystem3:3.1.0'
+    api "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0"
+    api 'com.nytimes.android:store3:3.1.1'
+    api 'com.nytimes.android:filesystem3:3.1.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.3' // same version as defined within store
 }
