@@ -31,11 +31,10 @@ import java.io.IOException
  * This class is used by okhttp to authenticate requests.
  */
 class AuthInterceptor(
-        private val connectionState: ConnectionState,
-        private val authenticationProvider: AuthenticationProvider,
-        private val tokenReaderWriter: TokenReaderWriter,
-        private val onAuthenticationFailedListener: OnAuthenticationFailedListener?
-
+    private val connectionState: ConnectionState,
+    private val authenticationProvider: AuthenticationProvider,
+    private val tokenReaderWriter: TokenReaderWriter,
+    private val onAuthenticationFailedListener: OnAuthenticationFailedListener?
 ) : Interceptor {
 
     @Throws(IOException::class)
