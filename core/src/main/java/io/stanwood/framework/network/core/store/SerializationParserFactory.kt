@@ -30,16 +30,22 @@ import kotlinx.serialization.UnstableDefault
 
 object SerializationParserFactory {
     @UnstableDefault
-    fun <T> createReaderParser(deserializer: KSerializer<T>,json: Json = Json.nonstrict): Parser<Reader, T> =
+    fun <T> createReaderParser(
+        deserializer: KSerializer<T>,
+        json: Json = Json.nonstrict
+    ): Parser<Reader, T> =
         SerializationReaderParser(deserializer, json)
 
     @UnstableDefault
     fun <T> createSourceParser(
         deserializer: KSerializer<T>,
         json: Json = Json.nonstrict
-    ): Parser<BufferedSource, T> = SerializationSourceParser(deserializer,json)
+    ): Parser<BufferedSource, T> = SerializationSourceParser(deserializer, json)
 
     @UnstableDefault
-    fun <T> createStringParser(deserializer: KSerializer<T>,json: Json = Json.nonstrict): Parser<String, T> =
+    fun <T> createStringParser(
+        deserializer: KSerializer<T>,
+        json: Json = Json.nonstrict
+    ): Parser<String, T> =
         SerializationStringParser(deserializer, json)
 }

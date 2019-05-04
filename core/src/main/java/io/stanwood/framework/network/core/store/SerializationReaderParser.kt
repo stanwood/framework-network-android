@@ -27,7 +27,10 @@ import kotlinx.io.Reader
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
-class SerializationReaderParser<Parsed>(private val deserializer: KSerializer<Parsed>,val json:Json) : Parser<Reader, Parsed> {
+class SerializationReaderParser<Parsed>(
+    private val deserializer: KSerializer<Parsed>,
+    val json: Json
+) : Parser<Reader, Parsed> {
     @Throws(ParserException::class)
     override fun apply(reader: Reader): Parsed =
         json.parse(deserializer, reader.use { it.readText() })
