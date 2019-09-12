@@ -24,28 +24,26 @@ package io.stanwood.framework.network.core.store
 import com.nytimes.android.external.store3.base.Parser
 import kotlinx.io.Reader
 import kotlinx.serialization.KSerializer
-import okio.BufferedSource
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.UnstableDefault
+import kotlinx.serialization.json.JsonConfiguration
+import okio.BufferedSource
 
 object SerializationParserFactory {
-    @UnstableDefault
+    private val stable = Json(JsonConfiguration.Stable)
     fun <T> createReaderParser(
         deserializer: KSerializer<T>,
-        json: Json = Json.nonstrict
+        json: Json = stable
     ): Parser<Reader, T> =
         SerializationReaderParser(deserializer, json)
 
-    @UnstableDefault
     fun <T> createSourceParser(
         deserializer: KSerializer<T>,
-        json: Json = Json.nonstrict
+        json: Json = stable
     ): Parser<BufferedSource, T> = SerializationSourceParser(deserializer, json)
 
-    @UnstableDefault
     fun <T> createStringParser(
         deserializer: KSerializer<T>,
-        json: Json = Json.nonstrict
+        json: Json = stable
     ): Parser<String, T> =
         SerializationStringParser(deserializer, json)
 }
