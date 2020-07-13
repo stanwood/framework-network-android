@@ -26,7 +26,7 @@ Then add this to you app's `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation 'com.github.stanwood.framework-network-android:arch:<insert latest version here>' // aar version available as well
+    implementation 'com.github.stanwood.framework-network-android:auth:<insert latest version here>' // aar version available as well
     implementation 'com.github.stanwood.framework-network-android:cache:<insert latest version here>' // aar version available as well
     implementation 'com.github.stanwood.framework-network-android:core:<insert latest version here>' // aar version available as well, automatically included when pulling in one of the other libraries
 }
