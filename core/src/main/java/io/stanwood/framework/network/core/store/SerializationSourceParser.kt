@@ -28,10 +28,10 @@ import kotlinx.serialization.json.Json
 import okio.BufferedSource
 
 class SerializationSourceParser<Parsed>(
-    private val deserializer: KSerializer<Parsed>,
-    val json: Json
+        private val deserializer: KSerializer<Parsed>,
+        private val json: Json
 ) : Parser<BufferedSource, Parsed> {
     @Throws(ParserException::class)
     override fun apply(bufferedSource: BufferedSource): Parsed =
-        json.parse(deserializer, bufferedSource.use { it.readUtf8() })
+        json.decodeFromString(deserializer, bufferedSource.use { it.readUtf8() })
 }

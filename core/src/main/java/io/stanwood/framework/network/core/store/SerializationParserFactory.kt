@@ -22,14 +22,16 @@
 package io.stanwood.framework.network.core.store
 
 import com.nytimes.android.external.store3.base.Parser
-import kotlinx.io.Reader
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import okio.BufferedSource
+import java.io.Reader
 
 object SerializationParserFactory {
-    private val stable = Json(JsonConfiguration.Stable)
+    private val stable = Json {
+        allowStructuredMapKeys = true
+    }
     fun <T> createReaderParser(
         deserializer: KSerializer<T>,
         json: Json = stable

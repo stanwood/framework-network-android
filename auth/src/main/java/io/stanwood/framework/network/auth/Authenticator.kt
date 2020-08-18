@@ -38,7 +38,7 @@ open class Authenticator(
     private val tokenReaderWriter: TokenReaderWriter,
     private val onAuthenticationFailedListener: OnAuthenticationFailedListener?
 ) : okhttp3.Authenticator {
-    override fun authenticate(route: Route?, response: Response): Request? = response.request().let { request ->
+    override fun authenticate(route: Route?, response: Response): Request? = response.request.let { request ->
         tokenReaderWriter.read(request)?.let { oldToken ->
             synchronized(authenticationProvider.lock) {
                 if (request.header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY) != null) {
@@ -98,7 +98,7 @@ open class Authenticator(
         all tokens
         */
         response.newBuilder().request(
-            response.request().newBuilder()
+            response.request.newBuilder()
                 .header(AuthHeaderKeys.RETRY_WITH_REFRESH_HEADER_KEY, "true")
                 .build()
         ).build()
