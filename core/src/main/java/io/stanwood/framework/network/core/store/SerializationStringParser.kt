@@ -32,5 +32,5 @@ class SerializationStringParser<Parsed>(
 ) : Parser<String, Parsed> {
     @Throws(ParserException::class)
     override fun apply(string: String): Parsed =
-        json.parse(deserializer, string)
+        json.decodeFromString(deserializer, string)
 }

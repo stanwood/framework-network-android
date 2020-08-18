@@ -23,15 +23,15 @@ package io.stanwood.framework.network.core.store
 
 import com.nytimes.android.external.store3.base.Parser
 import com.nytimes.android.external.store3.util.ParserException
-import kotlinx.io.Reader
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import java.io.Reader
 
 class SerializationReaderParser<Parsed>(
     private val deserializer: KSerializer<Parsed>,
-    val json: Json
+    private val json: Json
 ) : Parser<Reader, Parsed> {
     @Throws(ParserException::class)
     override fun apply(reader: Reader): Parsed =
-        json.parse(deserializer, reader.use { it.readText() })
+        json.decodeFromString(deserializer, reader.use { it.readText() })
 }
