@@ -22,8 +22,10 @@
 
 package io.stanwood.framework.network.cache;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -80,13 +82,14 @@ public class CacheNetworkInterceptor implements Interceptor {
         this.cacheForSeconds = cacheForSeconds;
     }
 
+    @NotNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
         String responseCacheHeader = request.header(CacheHeaderKeys.APPLY_RESPONSE_CACHE);
         String offlineCacheHeader = request.header(CacheHeaderKeys.APPLY_OFFLINE_CACHE);
-        boolean isGeneralCache = Boolean.valueOf(responseCacheHeader);
-        boolean isOfflineCache = Boolean.valueOf(offlineCacheHeader);
+        boolean isGeneralCache = Boolean.parseBoolean(responseCacheHeader);
+        boolean isOfflineCache = Boolean.parseBoolean(offlineCacheHeader);
         if (isGeneralCache || isOfflineCache) {
             Response originalResponse = chain.proceed(request);
             Response.Builder builder = originalResponse.newBuilder();
