@@ -1,15 +1,13 @@
-[![Release](https://jitpack.io/v/stanwood/framework-network-android.svg?style=flat-square)](https://jitpack.io/#stanwood/framework-network-android)
-[![Build Status](https://app.bitrise.io/app/983e6342cc5e0e24/status.svg?token=QtXUf2lbVhJrANROaTkluQ&branch=develop)](https://app.bitrise.io/app/983e6342cc5e0e24)
+[![Release](https://jitpack.io/v/whisp-internet/framework-network-android.svg?style=flat-square)](https://jitpack.io/#stanwood/framework-network-android)
 [![API](https://img.shields.io/badge/API-16%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=16)
 
-# stanwood Network Utilities (Android)
+# whisp Internet Network Utilities (Android)
 
 A set of hopefully useful classes for common networking use cases.
 
 ## Import
 
-The stanwood Network Utilities are hosted on JitPack. Therefore you can simply
-import them by adding
+The whisp Internet Network Utilities (based on the [stanwood Network Utilities](https://github.com/stanwood/framework-network-android/)) are hosted on JitPack. Therefore you can simply import them by adding
 
 ```groovy
 allprojects {
@@ -26,9 +24,9 @@ Then add this to you app's `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation 'com.github.stanwood.framework-network-android:auth:<insert latest version here>' // aar version available as well
-    implementation 'com.github.stanwood.framework-network-android:cache:<insert latest version here>' // aar version available as well
-    implementation 'com.github.stanwood.framework-network-android:core:<insert latest version here>' // aar version available as well, automatically included when pulling in one of the other libraries
+    implementation 'com.github.whisp-internet.framework-network-android:auth:<insert latest version here>' // aar version available as well
+    implementation 'com.github.whisp-internet.framework-network-android:cache:<insert latest version here>' // aar version available as well
+    implementation 'com.github.whisp-internet.framework-network-android:core:<insert latest version here>' // aar version available as well, automatically included when pulling in one of the other libraries
 }
 ```
 
