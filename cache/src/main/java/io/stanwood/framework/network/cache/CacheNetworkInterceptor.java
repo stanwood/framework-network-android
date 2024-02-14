@@ -22,8 +22,10 @@
 
 package io.stanwood.framework.network.cache;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -53,12 +55,21 @@ import okhttp3.Response;
  * this library. In the future this might be added to the provided interceptors by means of
  * accepting a list of parameter keys instead of just the one of the auth parameter.
  *
- * <p>Configuration of the interceptor classes is mainly done by means of request headers. Check
- * out {@link CacheHeaderKeys} for more details on what the different headers do.
+ * <p>Configuration of the interceptor classes is mainly done via request headers. Check
+ * out {@link CacheHeaderKeys} for more details on what the different headers do. Add them to your
+ * requests like so:
+ * <pre>
+ * {@code @Headers({ CacheHeaderKeys.APPLY_RESPONSE_CACHE + ": true" })}
+ * </pre>
  *
- * <p>Add it as a network interceptor to your OkHttpClient Builder like so:
+ * <p>Add instances of this interceptor as a network interceptor to your OkHttpClient Builder like so:
  * <pre>
  * {@code okHttpClientBuilder.addNetworkInterceptor(new CacheNetworkInterceptor("auth", 3600))}
+ * </pre>
+ *
+ * Don't forget to add a cache to the builder as well:
+ * <pre>
+ * {@code okHttpClientBuilder.cache(new Cache(new File(app.cacheDir, "okhttp-storyly-rest-api-cache"), 10 * 1024))}
  * </pre>
  */
 public class CacheNetworkInterceptor implements Interceptor {
@@ -80,13 +91,14 @@ public class CacheNetworkInterceptor implements Interceptor {
         this.cacheForSeconds = cacheForSeconds;
     }
 
+    @NotNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
         String responseCacheHeader = request.header(CacheHeaderKeys.APPLY_RESPONSE_CACHE);
         String offlineCacheHeader = request.header(CacheHeaderKeys.APPLY_OFFLINE_CACHE);
-        boolean isGeneralCache = Boolean.valueOf(responseCacheHeader);
-        boolean isOfflineCache = Boolean.valueOf(offlineCacheHeader);
+        boolean isGeneralCache = Boolean.parseBoolean(responseCacheHeader);
+        boolean isOfflineCache = Boolean.parseBoolean(offlineCacheHeader);
         if (isGeneralCache || isOfflineCache) {
             Response originalResponse = chain.proceed(request);
             Response.Builder builder = originalResponse.newBuilder();
