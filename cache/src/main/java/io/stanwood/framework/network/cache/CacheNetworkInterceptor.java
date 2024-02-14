@@ -55,12 +55,21 @@ import okhttp3.Response;
  * this library. In the future this might be added to the provided interceptors by means of
  * accepting a list of parameter keys instead of just the one of the auth parameter.
  *
- * <p>Configuration of the interceptor classes is mainly done by means of request headers. Check
- * out {@link CacheHeaderKeys} for more details on what the different headers do.
+ * <p>Configuration of the interceptor classes is mainly done via request headers. Check
+ * out {@link CacheHeaderKeys} for more details on what the different headers do. Add them to your
+ * requests like so:
+ * <pre>
+ * {@code @Headers({ CacheHeaderKeys.APPLY_RESPONSE_CACHE + ": true" })}
+ * </pre>
  *
- * <p>Add it as a network interceptor to your OkHttpClient Builder like so:
+ * <p>Add instances of this interceptor as a network interceptor to your OkHttpClient Builder like so:
  * <pre>
  * {@code okHttpClientBuilder.addNetworkInterceptor(new CacheNetworkInterceptor("auth", 3600))}
+ * </pre>
+ *
+ * Don't forget to add a cache to the builder as well:
+ * <pre>
+ * {@code okHttpClientBuilder.cache(new Cache(new File(app.cacheDir, "okhttp-storyly-rest-api-cache"), 10 * 1024))}
  * </pre>
  */
 public class CacheNetworkInterceptor implements Interceptor {
